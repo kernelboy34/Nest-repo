@@ -1,9 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import {TiendaModule} from '../src/tienda/tienda.module'
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(3008);
+  app.setGlobalPrefix("tienda")
+  //app.useGlobalPipes(new ValidationPipe())
+  app.enableCors()
+  await app.listen(8000);
 }
 bootstrap();
