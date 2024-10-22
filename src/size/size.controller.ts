@@ -4,7 +4,7 @@ import { CreateSizeDto } from './dto/create-size.dto';
 import { UpdateSizeDto } from './dto/update-size.dto';
 
 @Controller('sizes')
-export class SizesController {
+export class SizeController {
   constructor(private readonly sizesService: SizeService) {}
 
   @Post('create')

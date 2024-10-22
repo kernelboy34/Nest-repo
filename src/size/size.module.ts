@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { SizeService } from './size.service';
-import { SizesController } from './size.controller';
+import { SizeController } from './size.controller';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Module({
-  controllers: [SizesController],
+  controllers: [SizeController],
   providers: [SizeService, PrismaService],
   exports:[SizeService]
 })
