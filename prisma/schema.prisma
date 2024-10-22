@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model bills {
+  idbills       Int      @id @default(autoincrement())
+  sales_idsales Int
+  total_price   Decimal? @db.Decimal(10, 2)
+  is_deleted    Int?     @default(0) @db.TinyInt
+  sales         sales    @relation(fields: [sales_idsales], references: [idsales], onDelete: NoAction, onUpdate: NoAction, map: "fk_bills_sales1")
+
+  @@index([sales_idsales], map: "fk_bills_sales1_idx")
+}
+
+model departments {
+  iddepartments Int      @id @default(autoincrement())
+  name          String   @db.VarChar(45)
+  address       String   @db.VarChar(45)
+  is_deleted    Int?     @default(0) @db.TinyInt
+  stocks        stocks[]
+}
+
+model personal_data {
+  idpersonal_data Int     @id @default(autoincrement())
+  user_iduser     Int
+  name            String  @db.VarChar(45)
+  lastname        String  @db.VarChar(45)
+  bank_account    String  @db.VarChar(45)
+  phone           String? @db.VarChar(45)
+  address         String? @db.VarChar(45)
+  is_deleted      Int?    @default(0) @db.TinyInt
+  user            user    @relation(fields: [user_iduser], references: [iduser], onDelete: NoAction, onUpdate: NoAction, map: "fk_personal_data_user1")
+
+  @@index([user_iduser], map: "fk_personal_data_user1_idx")
+}
+
+model product_sizes {
+  idproduct_sizes     Int      @id @default(autoincrement())
+  products_idproducts Int
+  sizes_idsizes       Int
+  amount              Decimal? @db.Decimal(10, 2)
+  is_deleted          Int?     @default(0) @db.TinyInt
+  products            products @relation(fields: [products_idproducts], references: [idproducts], onDelete: NoAction, onUpdate: NoAction, map: "fk_product_sizes_products1")
+  sizes               sizes    @relation(fields: [sizes_idsizes], references: [idsizes], onDelete: NoAction, onUpdate: NoAction, map: "fk_product_sizes_sizes1")
+
+  @@index([products_idproducts], map: "fk_product_sizes_products1_idx")
+  @@index([sizes_idsizes], map: "fk_product_sizes_sizes1_idx")
+}
+
+model products {
+  idproducts    Int             @id @default(autoincrement())
+  name          String?         @db.VarChar(45)
+  imageUrl      String?         @db.VarChar(255)
+  unitPrice     Decimal?        @db.Decimal(10, 2)
+  is_deleted    Int?            @default(0) @db.TinyInt
+  product_sizes product_sizes[]
+  sale_products sale_products[]
+  stocks        stocks[]
+}
+
+model rols {
+  idrols     Int    @id @default(autoincrement())
+  name       String @db.VarChar(45)
+  is_deleted Int?   @default(0) @db.TinyInt
+  user       user[]
+}
+
+model sale_products {
+  idsale_products     Int      @id @default(autoincrement())
+  sales_idsales       Int
+  products_idproducts Int
+  quantity            String   @db.VarChar(45)
+  total_price         Decimal? @db.Decimal(10, 2)
+  is_deleted          Int?     @default(0) @db.TinyInt
+  products            products @relation(fields: [products_idproducts], references: [idproducts], onDelete: NoAction, onUpdate: NoAction, map: "fk_sale_products_products1")
+  sales               sales    @relation(fields: [sales_idsales], references: [idsales], onDelete: NoAction, onUpdate: NoAction, map: "fk_sale_products_sales")
+
+  @@index([products_idproducts], map: "fk_sale_products_products1_idx")
+  @@index([sales_idsales], map: "fk_sale_products_sales_idx")
+}
+
+model sales {
+  idsales       Int             @id @default(autoincrement())
+  user_iduser   Int
+  date_sale     DateTime        @default(now()) @db.DateTime(0)
+  status        Int?            @db.TinyInt
+  is_deleted    Int?            @default(0) @db.TinyInt
+  bills         bills[]
+  sale_products sale_products[]
+  user          user            @relation(fields: [user_iduser], references: [iduser], onDelete: NoAction, onUpdate: NoAction, map: "fk_sales_user1")
+
+  @@index([user_iduser], map: "fk_sales_user1_idx")
+}
+
+model sizes {
+  idsizes       Int             @id @default(autoincrement())
+  name          String?         @db.VarChar(45)
+  is_deleted    Int?            @default(0) @db.TinyInt
+  product_sizes product_sizes[]
+}
+
+model stocks {
+  idstocks            Int         @id @default(autoincrement())
+  branches_idbranches Int
+  products_idproducts Int
+  quantity            Int?
+  is_deleted          Int?        @default(0) @db.TinyInt
+  departments         departments @relation(fields: [branches_idbranches], references: [iddepartments], onDelete: NoAction, onUpdate: NoAction, map: "fk_stocks_branches1")
+  products            products    @relation(fields: [products_idproducts], references: [idproducts], onDelete: NoAction, onUpdate: NoAction, map: "fk_stocks_products1")
+
+  @@index([branches_idbranches], map: "fk_stocks_branches1_idx")
+  @@index([products_idproducts], map: "fk_stocks_products1_idx")
+}
+
+model user {
+  iduser        Int             @id @default(autoincrement())
+  rols_idrols   Int
+  name          String          @db.VarChar(45)
+  email         String          @unique(map: "email_UNIQUE") @db.VarChar(45)
+  password      String          @db.VarChar(45)
+  is_deleted    Int?            @default(0) @db.TinyInt
+  personal_data personal_data[]
+  sales         sales[]
+  rols          rols            @relation(fields: [rols_idrols], references: [idrols], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_rols1")
+
+  @@index([rols_idrols], map: "fk_user_rols1_idx")
+}

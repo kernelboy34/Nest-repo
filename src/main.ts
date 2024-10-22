@@ -4,6 +4,8 @@ import {TiendaModule} from '../src/tienda/tienda.module'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('tienda')
+  app.enableCors()
   await app.listen(3008);
 }
 bootstrap();
