@@ -24,6 +24,10 @@ export class StockService {
     return  await this.db.stocks.findMany() 
   }
 
+  @UsePipes(new ValidationPipe({
+    whitelist: true,
+    transform: true
+  }))
   async findOne(id: number) {
     const stockFound = await this.db.products.findUnique({
       where:{
@@ -36,6 +40,11 @@ export class StockService {
     return stockFound
   }
 
+
+  @UsePipes(new ValidationPipe({
+    whitelist: true,
+    transform: true
+  }))
   async update(id: number, data: UpdateStockDto) {
     const productFound = await this.db.stocks.update({
       where:{

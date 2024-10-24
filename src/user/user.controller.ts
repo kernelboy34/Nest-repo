@@ -19,12 +19,20 @@ export class UserController{
         return await this.userService.findAll()
     }
 
+    @UsePipes(new ValidationPipe({
+        whitelist: true,
+        transform: true
+    }))
     @UsePipes(new ValidationPipe({whitelist:true}))
     @Post('findOne')
     async findOne(@Body('email') email: string){
         return await this.userService.findOne(email)
     }
 
+    @UsePipes(new ValidationPipe({
+        whitelist: true,
+        transform: true
+    }))
     @Patch('updateOne/:id')
     async updateOne(@Param('id') id: number, @Body() data : UpdateUserDto){ 
         return await this.userService.update(data, +id)

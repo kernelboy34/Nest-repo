@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer'
 import { IsInt, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
 export class CreateSaleProductDto {
     @IsInt()

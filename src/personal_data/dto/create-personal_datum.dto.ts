@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator'
 
 export class CreatePersonalDatumDto {
@@ -15,6 +16,7 @@ export class CreatePersonalDatumDto {
 
     @IsNotEmpty()
     @IsString()
+    @Exclude()
     bank_account: string
 
     @IsOptional()
