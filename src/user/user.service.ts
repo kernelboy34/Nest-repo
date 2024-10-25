@@ -3,6 +3,7 @@ import { Prisma, user } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CreateUserDto } from "./dto/createUser.dto";
 import { UpdateUserDto } from "./dto/updateUser.dto";
+import { email } from "src/constants/VerifyEmails.constant";
 
 @Injectable()
 export class UserService{
@@ -10,6 +11,15 @@ export class UserService{
 
     async create(data: CreateUserDto):Promise<CreateUserDto>{
         try{
+            let ValidEmail = false
+            email.forEach(emails => {
+                if( data.email == emails){
+                    ValidEmail = true
+                }
+            })
+            if(!ValidEmail){
+                throw new ConflictException("Email domain not valid")
+            }
             return await this.db.user.create({
                 data
             })
