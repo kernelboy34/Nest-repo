@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSizeDto } from './dto/create-size.dto';
 import { UpdateSizeDto } from './dto/update-size.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -8,10 +8,6 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 export class SizeService {
   constructor(private db: PrismaService){}
 
-  @UsePipes(new ValidationPipe({
-    whitelist:true,
-    transform: true
-  }))
   async create(data: CreateSizeDto) {
     try{
       return await this.db.sizes.create({
@@ -27,36 +23,46 @@ export class SizeService {
   }
 
   async findOne(id: number) {
-    return `This action returns a #${id} size`;
+    return await this.db.sizes.findFirst({
+      where:{
+        idsizes: id
+      }
+    });
   }
 
   async update(id: number, data: UpdateSizeDto) {
     try{
-      const sizeUpdate = await this.db.sizes.update({
+      return await this.db.sizes.update({
         where:{
           idsizes: id
         },
         data
       })
-      if(!sizeUpdate){
-        throw new NotFoundException("Size Not Found")
-      }
     }catch(error){
-      console.log(error)
+      if(error instanceof PrismaClientKnownRequestError){
+        if(error.code === 'P2025'){
+          throw new NotFoundException("Size not found")
+        }
+      }
     }
   }
 
   async delete(id: number) {
-    const sizeDelete = await this.db.sizes.update({
-      where:{
-        idsizes: id
-      },
-      data:{
-        is_deleted: 1
+    try{
+      return await this.db.sizes.update({
+        where:{
+          idsizes: id
+        },
+        data:{
+          is_deleted: 1
+        }
+      })
+    }catch(error){
+      if(error instanceof PrismaClientKnownRequestError){
+        if(error.code == 'P2025'){
+          throw new NotFoundException("Size to delete not found")
+        }
       }
-    })
-    if(sizeDelete){
-      throw new NotFoundException("Size Not Found")
     }
   }
 }

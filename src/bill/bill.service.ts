@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBillDto } from './dto/create-bill.dto';
 import { UpdateBillDto } from './dto/update-bill.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class BillService {
@@ -29,30 +30,38 @@ export class BillService {
   }
 
   async update(id: number, data: UpdateBillDto) {
-    const billFound = await this.db.bills.update({
-      where:{
-        idbills:id
-      },
-      data
-    })
-    if(!billFound){
-      throw new NotFoundException("Bill Not Found")
+    try{
+      return await this.db.bills.update({
+        where:{
+          idbills:id
+        },
+        data
+      })
+    }catch(error){
+      if(error instanceof PrismaClientKnownRequestError){
+        if(error.code == 'P2025'){
+          throw new NotFoundException("Bill Not Found")
+        }
+      } 
     }
-    return billFound
   }
 
   async remove(id: number) {
-    const billFound = this.db.bills.update({
-      where:{
-        idbills:id
-      },
-      data:{
-        is_deleted:1
-      }
-    })
-    if(!billFound){
-      throw new NotFoundException("Bill NOt Found")
+    try{
+      return await this.db.bills.update({
+        where:{
+          idbills:id
+        },
+        data:{
+          is_deleted: 1
+        }
+      })
+    }catch(error){
+      if(error instanceof PrismaClientKnownRequestError){
+        if(error.code == 'P2025'){
+          throw new NotFoundException("Bill Not Found")
+        }
+      } 
     }
-    return billFound
   }
 }

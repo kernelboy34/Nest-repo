@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePersonalDatumDto } from './dto/create-personal_datum.dto';
 import { UpdatePersonalDatumDto } from './dto/update-personal_datum.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class PersonalDataService {
@@ -30,32 +31,38 @@ export class PersonalDataService {
   }
 
   async update(id: number, data: UpdatePersonalDatumDto) {
-    const data_found = await this.db.personal_data.update({
-      where:{
-        idpersonal_data: id
-      },
-      data
-    })
-    if(!data_found){
-      throw new NotFoundException("Personal Data Not Found")
+    try{
+      return await this.db.personal_data.update({
+        where:{
+          idpersonal_data: id
+        },
+        data
+      })
+    }catch(error){
+      if(error instanceof PrismaClientKnownRequestError){
+        if(error.code == 'P2025'){
+          throw new NotFoundException("personal data to update not found")
+        }
+      }
     }
-    return data_found
   }
 
   async remove(id: number) {
-    const data_found = this.db.personal_data.update({
-      where:{
-        idpersonal_data:id
-      },
-      data:{
-        is_deleted: 1
+    try{
+      return await this.db.personal_data.update({
+        where:{
+          idpersonal_data: id
+        },
+        data:{
+          is_deleted: 1
+        }
+      })
+    }catch(error){
+      if(error instanceof PrismaClientKnownRequestError){
+        if(error.code == 'P2025'){
+          throw new NotFoundException("personal data to update not found")
+        }
       }
-    })
-
-    if(!data_found){
-      throw new NotFoundException("Personal Data Not Found")
     }
-
-    return data_found
   }
 }

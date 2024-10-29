@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe } from '@nestjs/common';
 import { SaleProductService } from './sale_product.service';
 import { CreateSaleProductDto } from './dto/create-sale_product.dto';
 import { UpdateSaleProductDto } from './dto/update-sale_product.dto';
@@ -7,6 +7,10 @@ import { UpdateSaleProductDto } from './dto/update-sale_product.dto';
 export class SaleProductController {
   constructor(private readonly saleProductService: SaleProductService) {}
 
+  @UsePipes(new ValidationPipe({
+    whitelist:true,
+    transform:true
+  }))
   @Post()
   create(@Body() createSaleProductDto: CreateSaleProductDto) {
     return this.saleProductService.create(createSaleProductDto);
@@ -22,13 +26,21 @@ export class SaleProductController {
     return this.saleProductService.findOne(+id);
   }
 
+  @UsePipes(new ValidationPipe({
+    whitelist:true,
+    transform:true
+  }))
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSaleProductDto: UpdateSaleProductDto) {
+  update(@Param('id') id: number, @Body() updateSaleProductDto: UpdateSaleProductDto) {
     return this.saleProductService.update(+id, updateSaleProductDto);
   }
 
+  @UsePipes(new ValidationPipe({
+    whitelist:true,
+    transform:true
+  }))
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.saleProductService.remove(+id);
   }
 }

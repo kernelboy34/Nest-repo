@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe } from '@nestjs/common';
 import { PersonalDataService } from './personal_data.service';
 import { CreatePersonalDatumDto } from './dto/create-personal_datum.dto';
 import { UpdatePersonalDatumDto } from './dto/update-personal_datum.dto';
@@ -7,28 +7,40 @@ import { UpdatePersonalDatumDto } from './dto/update-personal_datum.dto';
 export class PersonalDataController {
   constructor(private readonly personalDataService: PersonalDataService) {}
 
+  @UsePipes(new ValidationPipe({
+    whitelist:true,
+    transform:true
+  }))
   @Post('create')
-  async create(@Body() data: CreatePersonalDatumDto) {
-    return await this.personalDataService.create(data);
+  create(@Body() data: CreatePersonalDatumDto) {
+    return this.personalDataService.create(data);
   }
 
   @Get('findAll')
-  async findAll() {
-    return await this.personalDataService.findAll();
+  findAll() {
+    return this.personalDataService.findAll();
   }
 
   @Get('findOne/:id')
-  async findOne(@Param('id') id: string) {
-    return await this.personalDataService.findOne(+id);
+  findOne(@Param('id') id: string) {
+    return this.personalDataService.findOne(+id);
   }
 
+  @UsePipes(new ValidationPipe({
+    whitelist:true,
+    transform:true
+  }))
   @Patch('updateOne/:id')
-  async update(@Param('id') id: string, @Body() updatePersonalDatumDto: UpdatePersonalDatumDto) {
-    return await this.personalDataService.update(+id, updatePersonalDatumDto);
+  update(@Param('id') id: string, @Body() updatePersonalDatumDto: UpdatePersonalDatumDto) {
+    return this.personalDataService.update(+id, updatePersonalDatumDto);
   }
 
+  @UsePipes(new ValidationPipe({
+    whitelist:true,
+    transform:true
+  }))
   @Delete('deleteOne/:id')
-  async remove(@Param('id') id: string) {
-    return await this.personalDataService.remove(+id);
+  remove(@Param('id') id: string) {
+    return this.personalDataService.remove(+id);
   }
 }

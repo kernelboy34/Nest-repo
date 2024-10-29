@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ProductSizeService } from './product_size.service';
 import { CreateProductSizeDto } from './dto/create-product_size.dto';
 import { UpdateProductSizeDto } from './dto/update-product_size.dto';
@@ -7,6 +7,10 @@ import { UpdateProductSizeDto } from './dto/update-product_size.dto';
 export class ProductSizeController {
   constructor(private readonly productSizeService: ProductSizeService) {}
 
+  @UsePipes(new ValidationPipe({
+    whitelist:true,
+    transform:true
+  }))
   @Post('create')
   create(@Body() createProductSizeDto: CreateProductSizeDto) {
     return this.productSizeService.create(createProductSizeDto);
@@ -22,11 +26,19 @@ export class ProductSizeController {
     return this.productSizeService.findOne(+id);
   }
 
+  @UsePipes(new ValidationPipe({
+    whitelist:true,
+    transform:true
+  }))
   @Patch('updateOne/:id')
   update(@Param('id') id: string, @Body() updateProductSizeDto: UpdateProductSizeDto) {
     return this.productSizeService.update(+id, updateProductSizeDto);
   }
 
+  @UsePipes(new ValidationPipe({
+    whitelist:true,
+    transform:true
+  }))
   @Delete('deleteOne/:id')
   remove(@Param('id') id: string) {
     return this.productSizeService.remove(+id);

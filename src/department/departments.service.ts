@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class DepartmentsService {
@@ -30,31 +31,38 @@ export class DepartmentsService {
   }
 
   async update(id: number, data: UpdateDepartmentDto) {
-    const DepartmentUpdate = await this.db.departments.update({
-      where:{
-        iddepartments: id
-      },
-      data
-    })
-    if(!DepartmentUpdate){
-      throw new NotFoundException("Department not found")
+    try{
+      return await this.db.departments.update({
+        where:{
+          iddepartments: id
+        },
+        data
+      })
+    }catch(error){
+      if(error instanceof PrismaClientKnownRequestError){
+        if(error.code == 'P2025'){
+          throw new NotFoundException("Department not found")
+        }
+      }
     }
-    return await DepartmentUpdate
   }
 
   async delete(id: number) {
-    const DepartmentDelete = await this.db.departments.update({
-      where:{
-        iddepartments:id
-      },
-      data:{
-        is_deleted: 1
+    try{
+      return await this.db.departments.update({
+        where:{
+          iddepartments: id
+        },
+        data:{
+          is_deleted: 1
+        }
+      })
+    }catch(error){
+      if(error instanceof PrismaClientKnownRequestError){
+        if(error.code == 'P2025'){
+          throw new NotFoundException("Department not found")
+        }
       }
-    })
-    if(!DepartmentDelete){
-      throw new NotFoundException("Department to delete not found")
     }
-
-    return await DepartmentDelete
   }
 }
