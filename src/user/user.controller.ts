@@ -10,29 +10,37 @@ export class UserController{
 
     @UsePipes(new ValidationPipe({ transform: true, whitelist: true}))
     @Post('create')
-    async create(@Body() createUser: CreateUserDto){
+    create(@Body() createUser: CreateUserDto){
         return this.userService.create(createUser)
     }
     
     @Get('findAll')
-    async findAll(){
-        return await this.userService.findAll()
+    findAll(){
+        return this.userService.findAll()
     }
 
+    @UsePipes(new ValidationPipe({
+        whitelist: true,
+        transform: true
+    }))
     @UsePipes(new ValidationPipe({whitelist:true}))
     @Post('findOne')
-    async findOne(@Body('email') email: string){
-        return await this.userService.findOne(email)
+    findOne(@Body('email') email: string){
+        return this.userService.findOne(email)
     }
 
+    @UsePipes(new ValidationPipe({
+        whitelist: true,
+        transform: true
+    }))
     @Patch('updateOne/:id')
-    async updateOne(@Param('id') id: number, @Body() data : UpdateUserDto){ 
-        return await this.userService.update(data, +id)
+    updateOne(@Param('id') id: number, @Body() data : UpdateUserDto){ 
+        return this.userService.update(data, +id)
     }
 
     @UsePipes(new ValidationPipe({whitelist:true, transform: true}))
     @Delete('deleteOne')
-    async deleteOne(@Body('id') id: number){
-        return await this.userService.delete(id)
+    deleteOne(@Body('id') id: number){
+        return this.userService.delete(id)
     }
 }

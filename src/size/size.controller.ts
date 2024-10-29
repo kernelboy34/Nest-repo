@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe } from '@nestjs/common';
 import { SizeService } from './size.service';
 import { CreateSizeDto } from './dto/create-size.dto';
 import { UpdateSizeDto } from './dto/update-size.dto';
@@ -7,28 +7,40 @@ import { UpdateSizeDto } from './dto/update-size.dto';
 export class SizeController {
   constructor(private readonly sizesService: SizeService) {}
 
+  @UsePipes(new ValidationPipe({
+    whitelist: true,
+    transform: true
+  }))
   @Post('create')
-  async create(@Body() createSizeDto: CreateSizeDto) {
-    return await this.sizesService.create(createSizeDto);
+  create(@Body() createSizeDto: CreateSizeDto) {
+    return this.sizesService.create(createSizeDto);
   }
 
   @Get('findAll')
-  async findAll() {
-    return await this.sizesService.findAll();
+  findAll() {
+    return this.sizesService.findAll();
   }
 
   @Get('findOne/:id')
-  async findOne(@Param('id') id: string) {
-    return await this.sizesService.findOne(+id);
+  findOne(@Param('id') id: string) {
+    return this.sizesService.findOne(+id);
   }
 
+  @UsePipes(new ValidationPipe({
+    whitelist: true,
+    transform: true
+  }))
   @Patch('updateOne/:id')
-  async update(@Param('id') id: string, @Body() updateSizeDto: UpdateSizeDto) {
-    return await this.sizesService.update(+id, updateSizeDto);
+  update(@Param('id') id: string, @Body() updateSizeDto: UpdateSizeDto) {
+    return this.sizesService.update(+id, updateSizeDto);
   }
 
+  @UsePipes(new ValidationPipe({
+    whitelist: true,
+    transform: true
+  }))
   @Delete('deleteOne/:id')
-  async remove(@Param('id') id: string) {
-    return await this.sizesService.delete(+id);
+  remove(@Param('id') id: string) {
+    return this.sizesService.delete(+id);
   }
 }

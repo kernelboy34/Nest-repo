@@ -3,6 +3,8 @@ import { Prisma, user } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CreateUserDto } from "./dto/createUser.dto";
 import { UpdateUserDto } from "./dto/updateUser.dto";
+import { email } from "src/constants/VerifyEmails.constant";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 @Injectable()
 export class UserService{
@@ -10,6 +12,15 @@ export class UserService{
 
     async create(data: CreateUserDto):Promise<CreateUserDto>{
         try{
+            let ValidEmail = false
+            email.forEach(emails => {
+                if( data.email == emails){
+                    ValidEmail = true
+                }
+            })
+            if(!ValidEmail){
+                throw new ConflictException("Email domain not valid")
+            }
             return await this.db.user.create({
                 data
             })
@@ -39,18 +50,22 @@ export class UserService{
     }
 
     async update(data: UpdateUserDto, id: number): Promise<UpdateUserDto>{
-        const userFoundToUdpate = await this.db.user.update({
-            where:{
-                iduser:id
-            },
-            data:{
-                ...data
+        try{
+            return await this.db.user.update({
+                where:{
+                    iduser:id
+                },
+                data:{
+                    ...data
+                }
+            })
+        }catch(error){
+            if(error instanceof PrismaClientKnownRequestError){
+                if(error.code == 'P2025'){
+                    throw new NotFoundException("User Not Found")
+                }
             }
-        })
-        if(!userFoundToUdpate){
-            throw new NotFoundException("User Not Found")
         }
-        return userFoundToUdpate
     }
 
     async delete(id: number): Promise<user>{
