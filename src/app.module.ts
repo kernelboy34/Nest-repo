@@ -14,9 +14,10 @@ import { SaleProductModule } from './sale_product/sale_product.module';
 import { ProductModule } from './product/product.module';
 import { StockModule } from './stock/stock.module';
 import { ProductSizeModule } from './product_size/product_size.module';
+import { EmailModule } from './services/smtp/smtp.module'
 
 @Module({
-  imports: [TiendaModule, UserModule, RolsModule, AuthModule, DepartmentsModule, SizesModule, PersonalDataModule, BillModule, SaleModule, SaleProductModule, ProductModule, StockModule, ProductSizeModule],
+  imports: [TiendaModule, UserModule, RolsModule, AuthModule, DepartmentsModule, SizesModule, PersonalDataModule, BillModule, SaleModule, SaleProductModule, ProductModule, StockModule, ProductSizeModule,EmailModule],
   controllers: [AppController],
   providers: [AppService],
 })
