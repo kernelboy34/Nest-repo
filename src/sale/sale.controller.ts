@@ -26,11 +26,19 @@ export class SaleController {
     return this.saleService.findOne(+id);
   }
 
+  @UsePipes(new ValidationPipe({
+    whitelist: true,
+    transform: true
+  }))
   @Patch('updateOne/:id')
   update(@Param('id') id: string, @Body() updateSaleDto: UpdateSaleDto) {
     return this.saleService.update(+id, updateSaleDto);
   }
 
+  @UsePipes(new ValidationPipe({
+    whitelist: true,
+    transform: true
+  }))
   @Delete('deleteOne/:id')
   remove(@Param('id') id: string) {
     return this.saleService.remove(+id);
