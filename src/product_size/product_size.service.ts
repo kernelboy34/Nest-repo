@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductSizeDto } from './dto/create-product_size.dto';
 import { UpdateProductSizeDto } from './dto/update-product_size.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class ProductSizeService {
@@ -17,7 +18,7 @@ export class ProductSizeService {
   }
 
   async findAll() {
-    return  await this.db.product_sizes.findMany() 
+    return await this.db.product_sizes.findMany() 
   }
 
   async findOne(id: number) {
@@ -33,29 +34,38 @@ export class ProductSizeService {
   }
 
   async update(id: number, data: UpdateProductSizeDto) {
-    const productSizeFound = await this.db.product_sizes.update({
-      where:{
-        idproduct_sizes:id
-      },
-      data
-    })
-    if(!productSizeFound){
-      throw new NotFoundException("Product Size Not Found")
+    try{
+      return await this.db.product_sizes.update({
+        where:{
+          idproduct_sizes:id
+        },
+        data
+      })
+    }catch(error){
+      if(error instanceof PrismaClientKnownRequestError){
+        if(error.code === 'P2025'){
+          throw new NotFoundException("Product size not found")
+        }
+      }
     }
   }
 
   async remove(id: number) {
-    const productSizeFound = await this.db.product_sizes.update({
-      where:{
-        idproduct_sizes: id
-      },
-      data:{
-        is_deleted: 1
+    try{
+      return await this.db.product_sizes.update({
+        where:{
+          idproduct_sizes: id
+        },
+        data:{
+          is_deleted: 1
+        }
+      })
+    }catch(error){
+      if(error instanceof PrismaClientKnownRequestError){
+        if(error.code === 'P2025'){
+          throw new NotFoundException("Product to delete Not found")
+        }
       }
-    })
-    if(!productSizeFound){
-      throw new NotFoundException("Product Size Not Found")
     }
-    return productSizeFound
   }
 }

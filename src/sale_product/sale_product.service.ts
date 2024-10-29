@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSaleProductDto } from './dto/create-sale_product.dto';
 import { UpdateSaleProductDto } from './dto/update-sale_product.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class SaleProductService {
@@ -33,14 +34,19 @@ export class SaleProductService {
   }
 
   async update(id: number, data: UpdateSaleProductDto) {
-    const saleProductFound = await this.db.sale_products.update({
-      where:{
-        idsale_products: id
-      },
-      data
-    })
-    if(!saleProductFound){
-      throw new NotFoundException("SaleProduct Not Found")
+    try{
+      return await this.db.sale_products.update({
+        where:{
+          idsale_products: id
+        },
+        data
+      })
+    }catch(error){
+      if(error instanceof PrismaClientKnownRequestError){
+        if(error.code === 'P2025'){
+          throw new NotFoundException("SaleProduct Not Found")
+        }
+      }
     }
   }
 

@@ -1,15 +1,12 @@
-import { Injectable, NotFoundException, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Injectable, NotFoundException, UsePipes} from '@nestjs/common';
 import { CreateStockDto } from './dto/create-stock.dto';
 import { UpdateStockDto } from './dto/update-stock.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class StockService {
   constructor(private db: PrismaService){}
-  @UsePipes(new ValidationPipe({
-    whitelist:true,
-    transform: true
-  }))
   async create(data: CreateStockDto) {
     try{
       return this.db.stocks.create({
@@ -24,10 +21,6 @@ export class StockService {
     return  await this.db.stocks.findMany() 
   }
 
-  @UsePipes(new ValidationPipe({
-    whitelist: true,
-    transform: true
-  }))
   async findOne(id: number) {
     const stockFound = await this.db.products.findUnique({
       where:{
@@ -40,35 +33,39 @@ export class StockService {
     return stockFound
   }
 
-
-  @UsePipes(new ValidationPipe({
-    whitelist: true,
-    transform: true
-  }))
   async update(id: number, data: UpdateStockDto) {
-    const productFound = await this.db.stocks.update({
-      where:{
-        idstocks:id
-      },
-      data
-    })
-    if(!productFound){
-      throw new NotFoundException("stock Not Found")
+    try{
+      return await this.db.stocks.update({
+        where:{
+          idstocks:id
+        },
+        data
+      })
+    }catch(error){
+      if(error instanceof PrismaClientKnownRequestError){
+        if(error.code == 'P2025'){
+          throw new NotFoundException("stock to update not found")
+        }
+      }
     }
   }
 
   async remove(id: number) {
-    const productFound = await this.db.stocks.update({
-      where:{
-        idstocks: id
-      },
-      data:{
-        is_deleted: 1
+    try{
+      return await this.db.stocks.update({
+        where:{
+          idstocks: id
+        },
+        data:{
+          is_deleted: 1
+        }
+      })
+    }catch(error){
+      if(error instanceof PrismaClientKnownRequestError){
+        if(error.code == 'P2025'){
+          throw new NotFoundException("stock Not Found")
+        }
       }
-    })
-    if(!productFound){
-      throw new NotFoundException("stock Not Found")
     }
-    return productFound
   }
 }

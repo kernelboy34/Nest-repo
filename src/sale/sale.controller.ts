@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe } from '@nestjs/common';
 import { SaleService } from './sale.service';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
@@ -7,6 +7,10 @@ import { UpdateSaleDto } from './dto/update-sale.dto';
 export class SaleController {
   constructor(private readonly saleService: SaleService) {}
 
+  @UsePipes(new ValidationPipe({
+    whitelist: true,
+    transform: true
+  }))
   @Post('create')
   create(@Body() createSaleDto: CreateSaleDto) {
     return this.saleService.create(createSaleDto);

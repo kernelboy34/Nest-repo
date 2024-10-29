@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class SaleService {
@@ -33,29 +34,38 @@ export class SaleService {
   }
 
   async update(id: number, data: UpdateSaleDto) {
-    const saleFound = await this.db.sales.update({
-      where:{
-        idsales: id
-      },
-      data
-    })
-    if(!saleFound){
-      throw new NotFoundException("Sale Not Found")
+    try{
+      return await this.db.sales.update({
+        where:{
+          idsales: id
+        },
+        data
+      })
+    }catch(error){
+      if(error instanceof PrismaClientKnownRequestError){
+        if(error.code === 'P2025'){
+          throw new NotFoundException("Sale Not Found")
+        }
+      }
     }
   }
 
   async remove(id: number) {
-    const saleFound = await this.db.sales.update({
-      where:{
-        idsales: id
-      },
-      data:{
-        is_deleted: 1
+    try{
+      return await this.db.sales.update({
+        where:{
+          idsales: id
+        },
+        data:{
+          is_deleted: 1
+        }
+      })
+    }catch(error){
+      if(error instanceof PrismaClientKnownRequestError){
+        if(error.code === 'P2025'){
+          throw new NotFoundException("Sale Not Found")
+        }
       }
-    })
-    if(!saleFound){
-      throw new NotFoundException("Sale Not Found")
     }
-    return saleFound
   }
 }
