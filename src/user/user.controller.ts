@@ -24,9 +24,15 @@ export class UserController{
         transform: true
     }))
     @UsePipes(new ValidationPipe({whitelist:true}))
-    @Post('findOne')
-    findOne(@Body('email') email: string){
+    @Get('findOne/:email')
+    findOne(@Param('email') email: string){
         return this.userService.findOne(email)
+    }
+
+    @UsePipes(new ValidationPipe({whitelist:true, transform: true}))
+    @Get('findOneToLogin/:email')
+    findOneToLogin(@Param('email') email: string){
+        return this.userService.findOneToLogin(email) 
     }
 
     @UsePipes(new ValidationPipe({
@@ -39,8 +45,8 @@ export class UserController{
     }
 
     @UsePipes(new ValidationPipe({whitelist:true, transform: true}))
-    @Delete('deleteOne')
-    deleteOne(@Body('id') id: number){
-        return this.userService.delete(id)
+    @Delete('deleteOne/:id')
+    deleteOne(@Param('id') id: number){
+        return this.userService.delete(+id)
     }
 }

@@ -3,7 +3,7 @@ import { PersonalDataService } from './personal_data.service';
 import { CreatePersonalDatumDto } from './dto/create-personal_datum.dto';
 import { UpdatePersonalDatumDto } from './dto/update-personal_datum.dto';
 
-@Controller('personal-data')
+@Controller('personal_data')
 export class PersonalDataController {
   constructor(private readonly personalDataService: PersonalDataService) {}
 

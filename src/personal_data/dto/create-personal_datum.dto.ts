@@ -16,11 +16,15 @@ export class CreatePersonalDatumDto {
 
     @IsNotEmpty()
     @IsString()
-    @Exclude()
     bank_account: string
 
     @IsOptional()
     phone: string
     @IsOptional()
     address : string
+
+    @IsOptional()
+    @IsInt()
+    @IsNotEmpty()
+    is_deleted: number
 }

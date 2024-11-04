@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException} from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException} from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CreateRolsDto } from "./dto/rols.dto";
 import { rols } from "@prisma/client";
@@ -15,53 +15,57 @@ export class RolsService{
         })
     }
 
-    async getOne(id: number): Promise<rols>{
+    async findOne(id: number): Promise<rols>{
         const rolsFound = await this.db.rols.findFirst({
             where:{
                 idrols: id
             }
         })
         if(!rolsFound){
-            throw new NotFoundException("Rols Not Found")
+            throw new NotFoundException("Rol no encontrado")
         }
         return rolsFound
     }
 
-    async getAll(): Promise<rols[]>{
+    async findAll(): Promise<rols[]>{
         return await this.db.rols.findMany()
     }
 
-    async update(data : UpdateRolsDto, id: number): Promise<UpdateRolsDto>{
+    async updateOne(data : UpdateRolsDto, id: number): Promise<UpdateRolsDto>{
         try{
             return await this.db.rols.update({
                 where: {
-                    idrols: id
+                    idrols: id,
                 },
                 data
             })
         }catch(error){
             if(error instanceof PrismaClientKnownRequestError){
                 if(error.code == 'P2025'){
-                    throw new NotFoundException("Rol Not found")
+                    throw new NotFoundException("Rol no encontrado")
                 }
             }
         }
     }
 
-    async delete(id: number){
+    async deleteOne(id: number){
         try{
             return await this.db.rols.update({
                 where:{
-                    idrols: id
+                    idrols: id,
+                    NOT:{
+                        is_deleted: 1
+                    }
                 },
                 data:{
                     is_deleted: 1
                 }
             })
         }catch(error){
+            console.log(error)
             if(error instanceof PrismaClientKnownRequestError){
                 if(error.code == 'P2025'){
-                    throw new NotFoundException("Rols to delete not found")
+                    throw new NotFoundException("Rol no encontrado o fue eliminado")
                 }
             }
         }

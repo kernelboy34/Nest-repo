@@ -16,12 +16,12 @@ export class DepartmentsController {
     return this.departmentsService.create(createDepartmentDto);
   }
 
-  @Get('getAll')
+  @Get('findAll')
   findAll() {
     return this.departmentsService.findAll();
   }
 
-  @Get('getOne/:id')
+  @Get('findOne/:id')
   findOne(@Param('id') id: string) {
     return this.departmentsService.findOne(+id);
   }

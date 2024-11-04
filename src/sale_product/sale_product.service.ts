@@ -8,13 +8,9 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 export class SaleProductService {
   constructor(private db: PrismaService){}
   async create(data: CreateSaleProductDto) {
-    try{
-      return this.db.sale_products.create({
-        data
-      })
-    }catch(error){
-      console.log(error)
-    }
+    return await this.db.sale_products.create({
+      data
+    })
   }
 
   async findAll() {
@@ -28,7 +24,7 @@ export class SaleProductService {
       }
     })
     if(!saleProductFound){
-      throw new NotFoundException("SaleProduct Not Found")
+      throw new NotFoundException("Venta del producto no encontrado")
     }
     return saleProductFound
   }
@@ -37,14 +33,17 @@ export class SaleProductService {
     try{
       return await this.db.sale_products.update({
         where:{
-          idsale_products: id
+          idsale_products: id,
+          NOT:{
+            is_deleted: 1
+          }
         },
         data
       })
     }catch(error){
       if(error instanceof PrismaClientKnownRequestError){
         if(error.code === 'P2025'){
-          throw new NotFoundException("SaleProduct Not Found")
+          throw new NotFoundException("Venta del producto no encontrado")
         }
       }
     }
@@ -53,14 +52,17 @@ export class SaleProductService {
   async remove(id: number) {
     const saleFound = await this.db.sale_products.update({
       where:{
-        idsale_products: id
+        idsale_products: id,
+        NOT:{
+          is_deleted: 1
+        }
       },
       data:{
         is_deleted: 1
       }
     })
     if(!saleFound){
-      throw new NotFoundException("SaleProduct Not Found")
+      throw new NotFoundException("Venta del producto no encontrada o fue eliminada")
     }
     return saleFound
   }

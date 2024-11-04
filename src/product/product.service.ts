@@ -28,7 +28,7 @@ export class ProductService {
       }
     })
     if(!productFound){
-      throw new NotFoundException("Product Not Found")
+      throw new NotFoundException("Producto no encontrado")
     }
     return productFound
   }
@@ -37,14 +37,14 @@ export class ProductService {
     try{
       return await this.db.products.update({
         where:{
-          idproducts:id
+          idproducts: id,
         },
         data
       })
     }catch(error){
       if(error instanceof PrismaClientKnownRequestError){
         if(error.code == 'P2025'){
-          throw new NotFoundException("Product to update not found")
+          throw new NotFoundException("Producto no encontrado")
         }
       }
     }
@@ -53,7 +53,10 @@ export class ProductService {
     try{
       return await this.db.products.update({
         where:{
-          idproducts:id
+          idproducts: id,
+          NOT:{
+            is_deleted: 1
+          }
         },
         data:{
           is_deleted: 1
@@ -62,7 +65,7 @@ export class ProductService {
     }catch(error){
       if(error instanceof PrismaClientKnownRequestError){
         if(error.code == 'P2025'){
-          throw new NotFoundException("Product to update not found")
+          throw new NotFoundException("Producto no encontrado o fue eliminado")
         }
       }
     }

@@ -11,4 +11,9 @@ export class CreateProductSizeDto {
     @IsNumber()
     @IsOptional()
     amount: number
+
+    @IsOptional()
+    @IsInt()
+    @IsNotEmpty()
+    is_deleted: number
 }

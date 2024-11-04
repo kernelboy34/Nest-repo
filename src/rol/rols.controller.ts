@@ -14,31 +14,31 @@ export class RolsController{
         return this.rolsService.create(data)
     }
 
-    @Post('getAll')
+    @Get('findAll')
     findAll(){
-        return this.rolsService.getAll()
+        return this.rolsService.findAll()
     }
 
-    @Post('getOne')
-    findOne(@Body('id') id: number){
-        return this.rolsService.getOne(id)
+    @Get('findOne/:id')
+    findOne(@Param('id') id: number){
+        return this.rolsService.findOne(+id)
     }
 
     @UsePipes(new ValidationPipe({
         whitelist: true,
         transform: true
     }))
-    @Patch('update/:id')
+    @Patch('updateOne/:id')
     updateOne(@Body() data: rols, @Param('id') id: number){
-        return this.rolsService.update(data, id)
+        return this.rolsService.updateOne(data, id)
     }
 
     @UsePipes(new ValidationPipe({
         transform:true,
         whitelist:true
     }))
-    @Delete('delete')
-    deleteOne(@Body('id') id: number){
-        return this.rolsService.delete(id)
+    @Delete('deleteOne/:id')
+    deleteOne(@Param('id') id: number){
+        return this.rolsService.deleteOne(id)
     }
 }

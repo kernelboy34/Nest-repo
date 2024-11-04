@@ -3,7 +3,7 @@ import { SaleProductService } from './sale_product.service';
 import { CreateSaleProductDto } from './dto/create-sale_product.dto';
 import { UpdateSaleProductDto } from './dto/update-sale_product.dto';
 
-@Controller('sale-product')
+@Controller('sale_product')
 export class SaleProductController {
   constructor(private readonly saleProductService: SaleProductService) {}
 
@@ -11,17 +11,17 @@ export class SaleProductController {
     whitelist:true,
     transform:true
   }))
-  @Post()
+  @Post('create')
   create(@Body() createSaleProductDto: CreateSaleProductDto) {
     return this.saleProductService.create(createSaleProductDto);
   }
 
-  @Get()
+  @Get('findAll')
   findAll() {
     return this.saleProductService.findAll();
   }
 
-  @Get(':id')
+  @Get('findOne/:id')
   findOne(@Param('id') id: string) {
     return this.saleProductService.findOne(+id);
   }
@@ -30,7 +30,7 @@ export class SaleProductController {
     whitelist:true,
     transform:true
   }))
-  @Patch(':id')
+  @Patch('updateOne/:id')
   update(@Param('id') id: number, @Body() updateSaleProductDto: UpdateSaleProductDto) {
     return this.saleProductService.update(+id, updateSaleProductDto);
   }
@@ -39,7 +39,7 @@ export class SaleProductController {
     whitelist:true,
     transform:true
   }))
-  @Delete(':id')
+  @Delete('deleteOne/:id')
   remove(@Param('id') id: number) {
     return this.saleProductService.remove(+id);
   }

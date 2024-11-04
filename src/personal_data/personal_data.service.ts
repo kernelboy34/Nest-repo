@@ -24,7 +24,7 @@ export class PersonalDataService {
       }
     })
     if(!data_found){
-      throw new NotFoundException("Personal Data Not Found")
+      throw new NotFoundException("Datos personales no encontrado")
     }
 
     return data_found
@@ -34,14 +34,17 @@ export class PersonalDataService {
     try{
       return await this.db.personal_data.update({
         where:{
-          idpersonal_data: id
+          idpersonal_data: id,
+          NOT:{
+            is_deleted: 1
+          }
         },
         data
       })
     }catch(error){
       if(error instanceof PrismaClientKnownRequestError){
         if(error.code == 'P2025'){
-          throw new NotFoundException("personal data to update not found")
+          throw new NotFoundException("Datos personales no encontrado")
         }
       }
     }
@@ -51,7 +54,10 @@ export class PersonalDataService {
     try{
       return await this.db.personal_data.update({
         where:{
-          idpersonal_data: id
+          idpersonal_data: id,
+          NOT:{
+            is_deleted: 1
+          }
         },
         data:{
           is_deleted: 1
@@ -60,7 +66,7 @@ export class PersonalDataService {
     }catch(error){
       if(error instanceof PrismaClientKnownRequestError){
         if(error.code == 'P2025'){
-          throw new NotFoundException("personal data to update not found")
+          throw new NotFoundException("Datos personales no encontrado o fue eliminado")
         }
       }
     }

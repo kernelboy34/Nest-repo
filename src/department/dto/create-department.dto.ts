@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator'
+import { IsInt, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator'
 
 export class CreateDepartmentDto {
     @IsNotEmpty()
@@ -10,4 +10,8 @@ export class CreateDepartmentDto {
     @IsNotEmpty()
     @MaxLength(45)
     address: string
+
+    @IsOptional()
+    @IsInt()
+    is_deleted: number
 }

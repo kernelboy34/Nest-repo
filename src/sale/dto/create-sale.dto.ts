@@ -1,14 +1,20 @@
-import { IsDate, IsInt, IsNotEmpty, IsNumber, IsOptional } from 'class-validator'
+import { IsDateString, IsInt, IsNotEmpty, IsNumber, IsOptional } from 'class-validator'
 export class CreateSaleDto {
     @IsInt()
     @IsNotEmpty()
     user_iduser: number
 
     @IsNotEmpty()
-    @IsDate()
+    @IsDateString()
+    @IsOptional()
     date_sale: string
 
     @IsNumber()
     @IsOptional()
     status: number
+
+    @IsOptional()
+    @IsInt()
+    @IsNotEmpty()
+    is_deleted: number
 }

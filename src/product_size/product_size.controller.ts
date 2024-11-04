@@ -3,7 +3,7 @@ import { ProductSizeService } from './product_size.service';
 import { CreateProductSizeDto } from './dto/create-product_size.dto';
 import { UpdateProductSizeDto } from './dto/update-product_size.dto';
 
-@Controller('product-size')
+@Controller('product_size')
 export class ProductSizeController {
   constructor(private readonly productSizeService: ProductSizeService) {}
 

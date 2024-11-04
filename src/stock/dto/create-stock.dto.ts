@@ -12,4 +12,9 @@ export class CreateStockDto {
     @IsOptional()
     @IsNumber()
     quantity: number
+
+    @IsOptional()
+    @IsInt()
+    @IsNotEmpty()
+    is_deleted: number
 }

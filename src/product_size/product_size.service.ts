@@ -28,7 +28,7 @@ export class ProductSizeService {
       }
     })
     if(!productSizeFound){
-      throw new NotFoundException("Product Size Not Found")
+      throw new NotFoundException("Tamaño no encontrado")
     }
     return productSizeFound
   }
@@ -37,14 +37,14 @@ export class ProductSizeService {
     try{
       return await this.db.product_sizes.update({
         where:{
-          idproduct_sizes:id
+          idproduct_sizes: id,
         },
         data
       })
     }catch(error){
       if(error instanceof PrismaClientKnownRequestError){
         if(error.code === 'P2025'){
-          throw new NotFoundException("Product size not found")
+          throw new NotFoundException("Tamaño del producto no encontrado")
         }
       }
     }
@@ -54,7 +54,10 @@ export class ProductSizeService {
     try{
       return await this.db.product_sizes.update({
         where:{
-          idproduct_sizes: id
+          idproduct_sizes: id,
+          NOT:{
+            is_deleted: 1
+          }
         },
         data:{
           is_deleted: 1
@@ -63,7 +66,7 @@ export class ProductSizeService {
     }catch(error){
       if(error instanceof PrismaClientKnownRequestError){
         if(error.code === 'P2025'){
-          throw new NotFoundException("Product to delete Not found")
+          throw new NotFoundException("Tamaño del producto no encontrado o fue eliminado")
         }
       }
     }

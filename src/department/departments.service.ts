@@ -25,7 +25,7 @@ export class DepartmentsService {
     })
 
     if(!DepartmentFound){
-      throw new NotFoundException("Cannot found the department")
+      throw new NotFoundException("Departamento no encontrado")
     }
     return DepartmentFound
   }
@@ -34,14 +34,14 @@ export class DepartmentsService {
     try{
       return await this.db.departments.update({
         where:{
-          iddepartments: id
+          iddepartments: id,
         },
         data
       })
     }catch(error){
       if(error instanceof PrismaClientKnownRequestError){
         if(error.code == 'P2025'){
-          throw new NotFoundException("Department not found")
+          throw new NotFoundException("Departamento no encontrado")
         }
       }
     }
@@ -51,7 +51,10 @@ export class DepartmentsService {
     try{
       return await this.db.departments.update({
         where:{
-          iddepartments: id
+          iddepartments: id,
+          NOT:{
+            is_deleted: 1
+          }
         },
         data:{
           is_deleted: 1
@@ -60,7 +63,7 @@ export class DepartmentsService {
     }catch(error){
       if(error instanceof PrismaClientKnownRequestError){
         if(error.code == 'P2025'){
-          throw new NotFoundException("Department not found")
+          throw new NotFoundException("Departamento no encontrado o fue eliminado")
         }
       }
     }

@@ -24,11 +24,11 @@ export class StockService {
   async findOne(id: number) {
     const stockFound = await this.db.products.findUnique({
       where:{
-        idproducts:id
+        idproducts: id
       }
     })
     if(!stockFound){
-      throw new NotFoundException("stock Not Found")
+      throw new NotFoundException("Cantidad no encontrada")
     }
     return stockFound
   }
@@ -37,14 +37,14 @@ export class StockService {
     try{
       return await this.db.stocks.update({
         where:{
-          idstocks:id
+          idstocks: id,
         },
         data
       })
     }catch(error){
       if(error instanceof PrismaClientKnownRequestError){
         if(error.code == 'P2025'){
-          throw new NotFoundException("stock to update not found")
+          throw new NotFoundException("Cantidad a actualizar no encontrada")
         }
       }
     }
@@ -63,7 +63,7 @@ export class StockService {
     }catch(error){
       if(error instanceof PrismaClientKnownRequestError){
         if(error.code == 'P2025'){
-          throw new NotFoundException("stock Not Found")
+          throw new NotFoundException("Cantidad no encontrada o fue eliminada")
         }
       }
     }

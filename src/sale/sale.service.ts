@@ -28,7 +28,7 @@ export class SaleService {
       }
     })
     if(!saleFound){
-      throw new NotFoundException("Sale Not Found")
+      throw new NotFoundException("Venta no encotrado")
     }
     return saleFound
   }
@@ -37,14 +37,14 @@ export class SaleService {
     try{
       return await this.db.sales.update({
         where:{
-          idsales: id
+          idsales: id,
         },
         data
       })
     }catch(error){
       if(error instanceof PrismaClientKnownRequestError){
         if(error.code === 'P2025'){
-          throw new NotFoundException("Sale Not Found")
+          throw new NotFoundException("Venta no encontrado")
         }
       }
     }
@@ -54,7 +54,10 @@ export class SaleService {
     try{
       return await this.db.sales.update({
         where:{
-          idsales: id
+          idsales: id,
+          NOT:{
+            is_deleted: 1
+          }
         },
         data:{
           is_deleted: 1
@@ -63,7 +66,7 @@ export class SaleService {
     }catch(error){
       if(error instanceof PrismaClientKnownRequestError){
         if(error.code === 'P2025'){
-          throw new NotFoundException("Sale Not Found")
+          throw new NotFoundException("Venta no fue encontrada o fue eliminada")
         }
       }
     }

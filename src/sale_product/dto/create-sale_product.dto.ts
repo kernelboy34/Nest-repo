@@ -16,4 +16,9 @@ export class CreateSaleProductDto {
     @IsOptional()
     @IsNumber()
     total_price: number
+
+    @IsOptional()
+    @IsInt()
+    @IsNotEmpty()
+    is_deleted: number
 }

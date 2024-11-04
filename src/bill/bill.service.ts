@@ -14,7 +14,15 @@ export class BillService {
   }
 
   async findAll() {
-    return await this.db.bills.findMany()
+    return await this.db.bills.findMany({
+      select:{
+        idbills: true,
+        is_deleted: true,
+        total_price: true,
+        sales_idsales: true,
+        sales:true,
+      }
+    })
   }
 
   async findOne(id: number) {
@@ -24,7 +32,7 @@ export class BillService {
       }
     })
     if(!billFound){
-      throw new NotFoundException("Bill Not Found")
+      throw new NotFoundException("Factura no encontrada")
     }
     return billFound
   }
@@ -33,14 +41,14 @@ export class BillService {
     try{
       return await this.db.bills.update({
         where:{
-          idbills:id
+          idbills: id,
         },
         data
       })
     }catch(error){
       if(error instanceof PrismaClientKnownRequestError){
         if(error.code == 'P2025'){
-          throw new NotFoundException("Bill Not Found")
+          throw new NotFoundException("Factura no encontrada")
         }
       } 
     }
@@ -50,7 +58,10 @@ export class BillService {
     try{
       return await this.db.bills.update({
         where:{
-          idbills:id
+          idbills:id,
+          NOT:{
+            is_deleted: 1
+          }
         },
         data:{
           is_deleted: 1
@@ -59,7 +70,7 @@ export class BillService {
     }catch(error){
       if(error instanceof PrismaClientKnownRequestError){
         if(error.code == 'P2025'){
-          throw new NotFoundException("Bill Not Found")
+          throw new NotFoundException("Factura no encontrada o fue eliminada")
         }
       } 
     }

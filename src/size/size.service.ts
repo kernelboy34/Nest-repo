@@ -23,25 +23,36 @@ export class SizeService {
   }
 
   async findOne(id: number) {
-    return await this.db.sizes.findFirst({
-      where:{
-        idsizes: id
+    try{
+      return await this.db.sizes.findFirst({
+        where:{
+          idsizes: id
+        },
+        include:{
+          product_sizes: true
+        }
+      });
+    }catch(error){
+      if(error instanceof PrismaClientKnownRequestError){
+        if(error.code == 'P2025'){
+          throw new NotFoundException("Tamaño no encontrado o fue eliminado")
+        }
       }
-    });
+    }
   }
 
   async update(id: number, data: UpdateSizeDto) {
     try{
       return await this.db.sizes.update({
         where:{
-          idsizes: id
+          idsizes: id,
         },
         data
       })
     }catch(error){
       if(error instanceof PrismaClientKnownRequestError){
         if(error.code === 'P2025'){
-          throw new NotFoundException("Size not found")
+          throw new NotFoundException("Tamaño no encontrado")
         }
       }
     }
@@ -51,7 +62,10 @@ export class SizeService {
     try{
       return await this.db.sizes.update({
         where:{
-          idsizes: id
+          idsizes: id,
+          NOT:{
+            is_deleted:1
+          }
         },
         data:{
           is_deleted: 1
@@ -60,7 +74,7 @@ export class SizeService {
     }catch(error){
       if(error instanceof PrismaClientKnownRequestError){
         if(error.code == 'P2025'){
-          throw new NotFoundException("Size to delete not found")
+          throw new NotFoundException("Tamaño no encontrado o fue eliminado")
         }
       }
     }
