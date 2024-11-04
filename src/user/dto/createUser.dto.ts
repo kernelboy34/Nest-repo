@@ -1,4 +1,5 @@
-import { IsEmail, IsInt, IsNotEmpty, IsString, MaxLength, MinLength} from 'class-validator'
+import { Exclude } from 'class-transformer'
+import { IsEmail, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength} from 'class-validator'
 
 export class CreateUserDto{
     @IsInt()
@@ -13,7 +14,12 @@ export class CreateUserDto{
     @IsNotEmpty()
     email: string
 
-    @MinLength(5)
+    @MinLength(5, {message: "La constraseña debe tener minimo una longitud de 5 caracteres"})
     @IsNotEmpty()
     password: string
+
+    @IsOptional()
+    @IsInt()
+    @IsNotEmpty()
+    is_deleted: number
 } 

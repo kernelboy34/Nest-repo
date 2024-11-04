@@ -8,29 +8,37 @@ import { rols } from "@prisma/client";
 export class RolsController{
     constructor(private readonly rolsService: RolsService){}
 
-    @UsePipes(new ValidationPipe({whitelist:true}))
+    @UsePipes(new ValidationPipe({whitelist:true, transform: true}))
     @Post('create')
-    async create(@Body() data: rols){
+    create(@Body() data: rols){
         return this.rolsService.create(data)
     }
 
-    @Post('getAll')
-    async findAll(){
-        return await this.rolsService.getAll()
+    @Get('findAll')
+    findAll(){
+        return this.rolsService.findAll()
     }
 
-    @Post('getOne')
-    async findOne(@Body('id') id: number){
-        return this.rolsService.getOne(id)
+    @Get('findOne/:id')
+    findOne(@Param('id') id: number){
+        return this.rolsService.findOne(+id)
     }
 
-    @Put('update/:id')
-    async updateOne(@Body() data: rols, @Param('id') id: number){
-        return this.rolsService.udpate(data, id)
+    @UsePipes(new ValidationPipe({
+        whitelist: true,
+        transform: true
+    }))
+    @Patch('updateOne/:id')
+    updateOne(@Body() data: rols, @Param('id') id: number){
+        return this.rolsService.updateOne(data, id)
     }
 
-    @Delete('delete')
-    async deleteOne(@Body('id') id: number){
-        return this.rolsService.delete(id)
+    @UsePipes(new ValidationPipe({
+        transform:true,
+        whitelist:true
+    }))
+    @Delete('deleteOne/:id')
+    deleteOne(@Param('id') id: number){
+        return this.rolsService.deleteOne(id)
     }
 }

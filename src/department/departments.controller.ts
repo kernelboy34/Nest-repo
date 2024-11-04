@@ -16,21 +16,29 @@ export class DepartmentsController {
     return this.departmentsService.create(createDepartmentDto);
   }
 
-  @Get('getAll')
+  @Get('findAll')
   findAll() {
     return this.departmentsService.findAll();
   }
 
-  @Get('getOne/:id')
+  @Get('findOne/:id')
   findOne(@Param('id') id: string) {
     return this.departmentsService.findOne(+id);
   }
 
+  @UsePipes(new ValidationPipe({
+    whitelist:true,
+    transform:true
+  }))
   @Patch('updateOne/:id')
   update(@Param('id') id: string, @Body() updateDepartmentDto: UpdateDepartmentDto) {
     return this.departmentsService.update(+id, updateDepartmentDto);
   }
 
+  @UsePipes(new ValidationPipe({
+    transform:true,
+    whitelist: true
+  }))
   @Delete('deleteOne/:id')
   remove(@Param('id') id: string) {
     return this.departmentsService.delete(+id);
