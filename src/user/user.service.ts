@@ -31,6 +31,8 @@ export class UserService{
                 if(error.code === "p2002"){
                     throw new ConflictException("El correo ya esta en uso")
                 }
+            } else {
+                throw new error
             }
         }
     }

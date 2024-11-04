@@ -122,7 +122,7 @@ model user {
   rols_idrols   Int
   name          String          @db.VarChar(45)
   email         String          @unique(map: "email_UNIQUE") @db.VarChar(45)
-  password      String          @db.VarChar(45)
+  password      String          @db.VarChar(255)
   is_deleted    Int?            @default(0) @db.TinyInt
   personal_data personal_data[]
   sales         sales[]

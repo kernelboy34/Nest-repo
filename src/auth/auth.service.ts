@@ -9,7 +9,8 @@ export class AuthService{
 
     async signIn(email: string, pass: string): Promise<{access_token: string}>{
         const user = await this.userService.findOneToLogin(email)
-        if(bcrypt.compare(pass, user.password)){
+        const password = user.password.toString()
+        if(!(await bcrypt.compare(pass, password))){
             throw new UnauthorizedException("Autorizacion denegada, revise las credenciales")
         }
         const payload = {sub: user.iduser, email: user.email}
@@ -18,4 +19,3 @@ export class AuthService{
         }
     }
 }
-

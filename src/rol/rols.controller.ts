@@ -1,7 +1,8 @@
 import { Controller, Get, Put, Post, Patch, Delete, Body, Param, UsePipes, ValidationPipe} from "@nestjs/common";
 import { RolsService } from "./rols.service";
 import { rols } from "@prisma/client";
-
+import { CreateRolsDto } from "./dto/rols.dto";
+import { UpdateRolsDto } from "./dto/rolsupdate.dto";
 
 @Controller("rols")
 
@@ -10,7 +11,7 @@ export class RolsController{
 
     @UsePipes(new ValidationPipe({whitelist:true, transform: true}))
     @Post('create')
-    create(@Body() data: rols){
+    create(@Body() data: CreateRolsDto){
         return this.rolsService.create(data)
     }
 
