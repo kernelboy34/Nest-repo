@@ -18,8 +18,13 @@ export class ProductService {
   }
 
   async findAll() {
-    return await this.db.products.findMany() 
+    return await this.db.products.findMany({
+      where: {
+        is_deleted: 0,
+      },
+    });
   }
+  
 
   async findOne(id: number) {
     const productFound = await this.db.products.findUnique({
