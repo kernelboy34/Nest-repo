@@ -1,5 +1,7 @@
 import { IsInt, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { Decimal } from '@prisma/client/runtime/library';
 export class CreateProductDto {
     @IsOptional()
     @IsString()
@@ -13,8 +15,9 @@ export class CreateProductDto {
 
     @IsOptional()
     @IsNumber()
+    @Type(()=> Decimal)
     @ApiProperty()
-    UnitPrice: number
+    unitPrice: Decimal
 
     @IsOptional()
     @IsInt()

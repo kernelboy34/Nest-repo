@@ -1,15 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProductService {
   constructor(private db: PrismaService){}
   async create(data: CreateProductDto) {
     try{
-      return this.db.products.create({
+      return await this.db.products.create({
         data
       })
     }catch(error){
@@ -17,6 +18,7 @@ export class ProductService {
     }
   }
 
+  @UsePipes(new ValidationPipe({transform: true, transformOptions:{enableImplicitConversion:true}}))
   async findAll() {
     return await this.db.products.findMany({
       where: {

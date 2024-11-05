@@ -21,11 +21,14 @@ export class ProductController {
                 const fileName = `${uuidv4()}${path.extname(file.originalname)}`; // nombre único
                 try{cb(null, fileName)}
                 catch(error){
-                  console.log(error);
+                    console.log(error);
                 }
             },
         }),
     }))
+
+    
+    @UsePipes(new ValidationPipe({transform: true , whitelist: true, transformOptions: { enableImplicitConversion: true },}))
     @Post('create')
     create(@UploadedFile() file: Express.Multer.File, @Body() createProductDto: CreateProductDto) {
         if (file) {
@@ -34,11 +37,13 @@ export class ProductController {
         return this.productService.create(createProductDto);
     }
 
+    @UsePipes(new ValidationPipe({transform: true , whitelist: true, transformOptions: { enableImplicitConversion: true },}))
     @Get('findAll')
     findAll() {
         return this.productService.findAll();
     }
 
+    @UsePipes(new ValidationPipe({transform: true }))
     @Get('findOne/:id')
     findOne(@Param('id') id: string) {
         return this.productService.findOne(+id);
