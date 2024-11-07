@@ -2,8 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, Validation
 import { StockService } from './stock.service';
 import { CreateStockDto } from './dto/create-stock.dto';
 import { UpdateStockDto } from './dto/update-stock.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('stock')
+@ApiTags("Existencias")
 export class StockController {
   constructor(private readonly stockService: StockService) {}
 
@@ -12,11 +14,13 @@ export class StockController {
     transform: true
   }))
   @Post('create')
+  @ApiOperation({summary:"Crear un nuevo stock"})
   create(@Body() createStockDto: CreateStockDto) {
     return this.stockService.create(createStockDto);
   }
 
   @Get('findAll')
+  @ApiOperation({summary: "Listar todos los stocks"})
   findAll() {
     return this.stockService.findAll();
   }
@@ -25,6 +29,7 @@ export class StockController {
     transform: true
   }))
   @Get('findOne/:id')
+  @ApiOperation({summary: "Listar un stock por id"})
   findOne(@Param('id') id: string) {
     return this.stockService.findOne(+id);
   }
@@ -34,6 +39,7 @@ export class StockController {
     transform: true
   }))
   @Patch('updateOne/:id')
+  @ApiOperation({summary: "Actualizar un stock por el id"})
   update(@Param('id') id: string, @Body() updateStockDto: UpdateStockDto) {
     return this.stockService.update(+id, updateStockDto);
   }
@@ -43,6 +49,7 @@ export class StockController {
     transform: true
   }))
   @Delete('deleteOne/:id')
+  @ApiOperation({summary: "Eliminar un stock por el id"})
   remove(@Param('id') id: string) {
     return this.stockService.remove(+id);
   }

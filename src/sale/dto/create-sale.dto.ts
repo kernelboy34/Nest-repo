@@ -1,7 +1,7 @@
 import { IsDateString, IsInt, IsNotEmpty, IsNumber, IsOptional } from 'class-validator'
 export class CreateSaleDto {
-    @IsInt()
-    @IsNotEmpty()
+    @IsInt({message:"El id del usuario deber ser un entero"})
+    @IsNotEmpty({message:"El id del usuario no debe ser vacio"})
     user_iduser: number
 
     @IsNotEmpty()

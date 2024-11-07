@@ -6,6 +6,7 @@ import { UpdateUserDto } from "./dto/updateUser.dto";
 import { email } from "src/constants/VerifyEmails.constant";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import * as bt from 'bcrypt'
+import {config} from '../config/config'
 
 @Injectable()
 export class UserService{
@@ -22,17 +23,16 @@ export class UserService{
                 throw new UnauthorizedException("Dominio de correo no permitido")
             }
         try{
-            data.password = await bt.hash(data.password, 10)
+            data.password = await bt.hash(data.password, config.salt)
             return await this.db.user.create({
                 data
             })
         }catch(error){
+            console.log(error)
             if(error instanceof Prisma.PrismaClientKnownRequestError){
                 if(error.code === "p2002"){
                     throw new ConflictException("El correo ya esta en uso")
                 }
-            } else {
-                throw new error
             }
         }
     }

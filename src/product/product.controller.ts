@@ -8,8 +8,10 @@ import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import { Response } from 'express';
 import * as fs from 'fs';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('product')
+@ApiTags("Productos")
 export class ProductController {
     constructor(private readonly productService: ProductService) {}
 
@@ -26,10 +28,8 @@ export class ProductController {
             },
         }),
     }))
-
-    
-    @UsePipes(new ValidationPipe({transform: true , whitelist: true, transformOptions: { enableImplicitConversion: true },}))
     @Post('create')
+    @ApiOperation({summary: "Crear un nuevo producto"})
     create(@UploadedFile() file: Express.Multer.File, @Body() createProductDto: CreateProductDto) {
         if (file) {
             createProductDto.imageUrl = file.path; // Guarda la ruta del archivo
@@ -39,12 +39,14 @@ export class ProductController {
 
     @UsePipes(new ValidationPipe({transform: true , whitelist: true, transformOptions: { enableImplicitConversion: true },}))
     @Get('findAll')
+    @ApiOperation({summary: "Listar un nuevo producto"})
     findAll() {
         return this.productService.findAll();
     }
 
     @UsePipes(new ValidationPipe({transform: true }))
     @Get('findOne/:id')
+    @ApiOperation({summary: "Listar un producto segun el id"})
     findOne(@Param('id') id: string) {
         return this.productService.findOne(+id);
     }
@@ -76,12 +78,14 @@ export class ProductController {
 
     @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
     @Patch('updateOne/:id')
+    @ApiOperation({summary: "Actualizar un producto segun el id"})
     update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
         return this.productService.update(+id, updateProductDto);
     }
 
     @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
     @Delete('deleteOne/:id')
+    @ApiOperation({summary: "Eliminar un producto segun el id"})
     remove(@Param('id') id: string) {
         return this.productService.remove(+id);
     }

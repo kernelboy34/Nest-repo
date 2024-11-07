@@ -3,24 +3,28 @@ import { RolsService } from "./rols.service";
 import { rols } from "@prisma/client";
 import { CreateRolsDto } from "./dto/rols.dto";
 import { UpdateRolsDto } from "./dto/rolsupdate.dto";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
 
 @Controller("rols")
-
+@ApiTags("Roles")
 export class RolsController{
     constructor(private readonly rolsService: RolsService){}
 
     @UsePipes(new ValidationPipe({whitelist:true, transform: true}))
     @Post('create')
+    @ApiOperation({summary: "Creat un nuevo rol"})
     create(@Body() data: CreateRolsDto){
         return this.rolsService.create(data)
     }
 
     @Get('findAll')
+    @ApiOperation({summary: "Listar todos los roles"})
     findAll(){
         return this.rolsService.findAll()
     }
 
     @Get('findOne/:id')
+    @ApiOperation({summary: "Listar un rol segun el id"})
     findOne(@Param('id') id: number){
         return this.rolsService.findOne(+id)
     }
@@ -30,6 +34,7 @@ export class RolsController{
         transform: true
     }))
     @Patch('updateOne/:id')
+    @ApiOperation({summary: "Actualizar un rol segun el id"})
     updateOne(@Body() data: rols, @Param('id') id: number){
         return this.rolsService.updateOne(data, id)
     }
@@ -39,6 +44,7 @@ export class RolsController{
         whitelist:true
     }))
     @Delete('deleteOne/:id')
+    @ApiOperation({summary: "Eliminar un rol segun el id"})
     deleteOne(@Param('id') id: number){
         return this.rolsService.deleteOne(id)
     }

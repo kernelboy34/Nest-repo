@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { UserModule } from "src/user/user.module";
 import { JwtModule } from "@nestjs/jwt";
-import { jwtConstants } from "./constants";
+import { config } from '../config/config'
 import { AuthController } from "./auth.controller";
 
 
@@ -12,7 +12,7 @@ import { AuthController } from "./auth.controller";
         UserModule,
         JwtModule.register({
             global: true,
-            secret: jwtConstants.secret,
+            secret: config.token,
             signOptions:{}
         })
     ],

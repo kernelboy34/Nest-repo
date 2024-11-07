@@ -1,6 +1,7 @@
 // hice las configuraciones aca sergio
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
+import { config } from 'src/config/config';
 
 @Injectable()
 export class SmtpService {
@@ -8,12 +9,12 @@ export class SmtpService {
 
   constructor() {
     this.transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com', 
-      port: 587,
-      secure: false,
+      host: config.host, 
+      port: config.port,
+      secure: config.secure,
       auth: {
-        user: "pruebasproyectos1234@gmail.com",
-        pass: "okoj xvnc dcwr fpea",
+        user: config.user,
+        pass: config.pass,
       },
     });
   }

@@ -3,17 +3,22 @@ import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/createUser.dto";
 
 import { UpdateUserDto } from "./dto/updateUser.dto";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
+@ApiTags("Usuarios")
 @Controller('user')
 export class UserController{
     constructor(private readonly userService: UserService){}
 
     @UsePipes(new ValidationPipe({ transform: true, whitelist: true}))
     @Post('create')
+    @ApiOperation({summary: "Crear un nuevo usuario"})
+    @ApiResponse({status: 201 , example: "Se ha creado un usuario"})
     create(@Body() createUser: CreateUserDto){
         return this.userService.create(createUser)
     }
     
+    @ApiOperation({summary: "Listar todos los usuarios"})
     @Get('findAll')
     findAll(){
         return this.userService.findAll()
@@ -23,13 +28,14 @@ export class UserController{
         whitelist: true,
         transform: true
     }))
-    @UsePipes(new ValidationPipe({whitelist:true}))
+    @ApiOperation({summary: "Listar un usuario por email"})
     @Get('findOne/:email')
     findOne(@Param('email') email: string){
         return this.userService.findOne(email)
     }
 
     @UsePipes(new ValidationPipe({whitelist:true, transform: true}))
+    @ApiOperation({summary: "Busqueda personalizada para el autentificacion"})
     @Get('findOneToLogin/:email')
     findOneToLogin(@Param('email') email: string){
         return this.userService.findOneToLogin(email) 
@@ -40,12 +46,14 @@ export class UserController{
         transform: true
     }))
     @Patch('updateOne/:id')
+    @ApiOperation({summary: "Actualizar un usuario"})
     updateOne(@Param('id') id: number, @Body() data : UpdateUserDto){ 
         return this.userService.update(data, +id)
     }
 
     @UsePipes(new ValidationPipe({whitelist:true, transform: true}))
     @Delete('deleteOne/:id')
+    @ApiOperation({summary: "Eliminacion de un usuario segun el id"})
     deleteOne(@Param('id') id: number){
         return this.userService.delete(+id)
     }
