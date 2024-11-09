@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, UseInterceptors, UploadedFile, NotFoundException, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, UseInterceptors, UploadedFile, NotFoundException, Res, UseGuards } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -8,8 +8,11 @@ import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import { Response } from 'express';
 import * as fs from 'fs';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { RolesGuard } from 'src/rol/rols.guard';
+import { Roles } from 'src/rol/decorators/rol.decorator';
 
+@ApiBearerAuth()
 @Controller('product')
 @ApiTags("Productos")
 export class ProductController {
@@ -28,8 +31,10 @@ export class ProductController {
             },
         }),
     }))
+    @UseGuards(RolesGuard)
     @Post('create')
     @ApiOperation({summary: "Crear un nuevo producto"})
+    @Roles('Administrador')
     create(@UploadedFile() file: Express.Multer.File, @Body() createProductDto: CreateProductDto) {
         if (file) {
             createProductDto.imageUrl = file.path; // Guarda la ruta del archivo
@@ -38,20 +43,33 @@ export class ProductController {
     }
 
     @UsePipes(new ValidationPipe({transform: true , whitelist: true, transformOptions: { enableImplicitConversion: true },}))
+    @UseGuards(RolesGuard)
     @Get('findAll')
     @ApiOperation({summary: "Listar un nuevo producto"})
+    @Roles('Administrador', 'Usuario')
     findAll() {
         return this.productService.findAll();
     }
 
     @UsePipes(new ValidationPipe({transform: true }))
+    @UseGuards(RolesGuard)
     @Get('findOne/:id')
     @ApiOperation({summary: "Listar un producto segun el id"})
+    @Roles('Administrador', 'Usuario')
     findOne(@Param('id') id: string) {
         return this.productService.findOne(+id);
     }
 
+    @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+    @Get('paginate/:tomar/:saltar')
+    @ApiOperation({summary: "Paginar productos"})
+    paginateProduct(@Param('tomar') take:number, @Param('saltar') skip: number){
+        return this.productService.paginateProducts(take, skip)
+    }
+
+    @UseGuards(RolesGuard)
     @Get('fetchByIdWithImage/:id')
+    @Roles('Administrador')
     async fetchByIdWithImage(@Param('id') id: string, @Res() res: Response) {
         const product = await this.productService.findOne(+id);
         
@@ -77,16 +95,21 @@ export class ProductController {
     }
 
     @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+    @UseGuards(RolesGuard)
     @Patch('updateOne/:id')
     @ApiOperation({summary: "Actualizar un producto segun el id"})
+    @Roles('Administrador')
     update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
         return this.productService.update(+id, updateProductDto);
     }
 
     @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+    @UseGuards(RolesGuard)
     @Delete('deleteOne/:id')
     @ApiOperation({summary: "Eliminar un producto segun el id"})
+    @Roles('Administrador')
     remove(@Param('id') id: string) {
         return this.productService.remove(+id);
     }
+
 }

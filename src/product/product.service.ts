@@ -40,6 +40,13 @@ export class ProductService {
     return productFound
   }
 
+  async paginateProducts(take: number, skip:number){
+    return await this.db.products.findMany({
+      skip: skip ,
+      take: take
+    })
+  }
+
   async update(id: number, data: UpdateProductDto) {
     try{
       return await this.db.products.update({

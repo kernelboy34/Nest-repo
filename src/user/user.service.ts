@@ -33,6 +33,9 @@ export class UserService{
                 if(error.code === "p2002"){
                     throw new ConflictException("El correo ya esta en uso")
                 }
+                if(error.code === "P2003"){
+                    throw new ConflictException("Rol no permitido")
+                }
             }
         }
     }
@@ -67,6 +70,12 @@ export class UserService{
                 rols: true
             }
         })
+    }
+
+    async findUserRole(userId: number) {
+        return this.db.rols.findFirst({
+            where: { user: { some: { iduser: userId } } }
+        });
     }
 
     async findOneToLogin(email: string) : Promise<user>{

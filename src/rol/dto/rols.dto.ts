@@ -4,7 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CreateRolsDto {
     @IsString()
     @IsNotEmpty()
-    @ApiProperty()
+    @ApiProperty({example: "Usuario", description: "Nombre de rol"})
     name:string
 
     @IsOptional()

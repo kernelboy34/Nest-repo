@@ -1,4 +1,3 @@
-import { Exclude } from 'class-transformer'
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength} from 'class-validator'
 
@@ -13,7 +12,7 @@ export class CreateUserDto{
     @ApiProperty({example: "Pepito", description:"Nombre del usuario"})
     name:string
 
-    @IsEmail()
+    @IsEmail({}, {message: "Correo Electronico no valido"})
     @IsNotEmpty({message:"Debe contener @ el correo"})
     @ApiProperty({example: "user@est.univalle.edu", description:"correo del usuario"})
     email: string

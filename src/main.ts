@@ -6,6 +6,7 @@ dotenv.config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = new DocumentBuilder()
+    .addBearerAuth()
     .setTitle('Boutique Univalle')
     .setDescription('Documentacion Univalle Boutique')
     .setVersion('1.0')

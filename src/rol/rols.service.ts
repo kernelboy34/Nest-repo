@@ -16,7 +16,7 @@ export class RolsService{
     }
 
     async findOne(id: number): Promise<rols>{
-        const rolsFound = await this.db.rols.findFirst({
+        const rolsFound = await this.db.rols.findUnique({
             where:{
                 idrols: id
             }

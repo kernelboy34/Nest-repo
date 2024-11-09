@@ -14,7 +14,13 @@ export class AuthService{
         if(!(await bcrypt.compare(data.pass, password))){
             throw new UnauthorizedException("Autorizacion denegada, revise las credenciales")
         }
-        const payload = {sub: data, email: user.email}
+
+        const userRole = await this.userService.findUserRole(user.iduser);
+        if (!userRole) {
+            throw new UnauthorizedException("El usuario no tiene un rol asignado");
+        }
+
+        const payload = {sub: data, email: user.email, rol:userRole.name}
         return{
             access_token: await this.jwtService.signAsync(payload)
         }
