@@ -2,18 +2,20 @@ import { Module } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { UserModule } from "src/user/user.module";
 import { JwtModule } from "@nestjs/jwt";
-import { jwtConstants } from "./constants";
-import { UserService } from "src/user/user.service";
+import { config } from '../config/config'
 import { AuthController } from "./auth.controller";
+import { PassportModule } from "@nestjs/passport";
+import { JwtStrategy } from "./auth.strategy";
 
 
 @Module({
-    providers:[AuthService],
+    providers:[AuthService, JwtStrategy],
     imports:[
         UserModule,
+        PassportModule,
         JwtModule.register({
             global: true,
-            secret: jwtConstants.secret,
+            secret: config.token,
             signOptions:{}
         })
     ],
