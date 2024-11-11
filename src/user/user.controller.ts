@@ -8,9 +8,9 @@ import { JwtAuthGuard } from "src/auth/auth.guard";
 import { Roles } from "src/rol/decorators/rol.decorator";
 import { RolesGuard } from "src/rol/rols.guard";
 
-@ApiBearerAuth()
+// @ApiBearerAuth()
 @ApiTags("Usuarios")
-@UseGuards(RolesGuard)
+// @UseGuards(RolesGuard)
 @Controller('user')
 export class UserController{
     constructor(private readonly userService: UserService){}
@@ -19,13 +19,13 @@ export class UserController{
     @Post('create')
     @ApiOperation({summary: "Crear un nuevo usuario"})
     @ApiResponse({status: 201 , example: "Se ha creado un usuario"})
-    @Roles('Administrador')
+    // @Roles('Administrador')
     create(@Body() createUser: CreateUserDto){
         return this.userService.create(createUser)
     }
     
     @ApiOperation({summary: "Listar todos los usuarios"})
-    @Get('findAll')
+    //@Get('findAll')
     @Roles('Administrador')
     findAll(){
         return this.userService.findAll()

@@ -42,8 +42,11 @@ export class ProductService {
 
   async paginateProducts(take: number, skip:number){
     return await this.db.products.findMany({
-      skip: skip ,
-      take: take
+      skip: skip,
+      take: take,
+      where:{
+        is_deleted: 0,
+      }
     })
   }
 

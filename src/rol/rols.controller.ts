@@ -31,7 +31,7 @@ export class RolsController{
 
     @Get('findOne/:id')
     @ApiOperation({summary: "Listar un rol segun el id"})
-    @Roles('Administracion', 'Usuario')
+    @Roles('Administrador', 'Usuario')
     findOne(@Param('id') id: number){
         return this.rolsService.findOne(+id)
     }
