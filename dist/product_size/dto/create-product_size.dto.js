@@ -22,8 +22,8 @@ __decorate([
     __metadata("design:type", Number)
 ], CreateProductSizeDto.prototype, "products_idproducts", void 0);
 __decorate([
-    (0, class_validator_1.IsInt)(),
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsInt)({ message: "el id del tamaño debe ser un entero" }),
+    (0, class_validator_1.IsNotEmpty)({ message: "El id del productos no debe estar vacio" }),
     (0, swagger_1.ApiProperty)({ example: 1, description: "Id de un nuevo tamaño" }),
     __metadata("design:type", Number)
 ], CreateProductSizeDto.prototype, "sizes_idsizes", void 0);

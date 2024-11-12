@@ -8,90 +8,81 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SizeService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../prisma/prisma.service");
-const library_1 = require("@prisma/client/runtime/library");
+const sequelize_1 = require("sequelize");
 let SizeService = class SizeService {
-    constructor(db) {
-        this.db = db;
+    constructor(sizeRepository) {
+        this.sizeRepository = sizeRepository;
     }
     async create(data) {
-        try {
-            return await this.db.sizes.create({
-                data
-            });
-        }
-        catch (error) {
-            console.log(error);
-        }
+        return await this.sizeRepository.create({
+            name: data.name
+        });
     }
     async findAll() {
-        return await this.db.sizes.findMany();
+        return await this.sizeRepository.findAll({
+            where: {
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
+                }
+            }
+        });
     }
     async findOne(id) {
-        try {
-            return await this.db.sizes.findFirst({
-                where: {
-                    idsizes: id
+        const sizeFound = await this.sizeRepository.findOne({
+            where: {
+                idsizes: {
+                    [sequelize_1.Op.eq]: id
                 },
-                include: {
-                    product_sizes: true
-                }
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code == 'P2025') {
-                    throw new common_1.NotFoundException("Tamaño no encontrado o fue eliminado");
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
                 }
             }
+        });
+        if (!sizeFound) {
+            throw new common_1.NotFoundException("Tamaño no encontrado o fue eliminado");
         }
+        return sizeFound;
     }
     async update(id, data) {
-        try {
-            return await this.db.sizes.update({
-                where: {
-                    idsizes: id,
-                },
-                data
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code === 'P2025') {
-                    throw new common_1.NotFoundException("Tamaño no encontrado");
+        const [sizeUpdate] = await this.sizeRepository.update(data, {
+            where: {
+                idsizes: {
+                    [sequelize_1.Op.eq]: id
                 }
             }
+        });
+        if (sizeUpdate === 0) {
+            throw new common_1.NotFoundException("Tamaño no encontrado o fue eliminado");
         }
+        return { message: "Tamaño actualizado correctamente", status: 200, data: data };
     }
     async delete(id) {
-        try {
-            return await this.db.sizes.update({
-                where: {
-                    idsizes: id,
-                    NOT: {
-                        is_deleted: 1
-                    }
+        const [sizeDeleted] = await this.sizeRepository.update({ is_deleted: 1 }, {
+            where: {
+                idsizes: {
+                    [sequelize_1.Op.eq]: id
                 },
-                data: {
-                    is_deleted: 1
-                }
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code == 'P2025') {
-                    throw new common_1.NotFoundException("Tamaño no encontrado o fue eliminado");
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
                 }
             }
+        });
+        if (sizeDeleted === 0) {
+            throw new common_1.NotFoundException("No se puede eliminar el tamaño porque no fue encontrado o fue eliminado");
         }
+        return { message: "Tamaño eliminado correctamente", status: 200 };
     }
 };
 exports.SizeService = SizeService;
 exports.SizeService = SizeService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __param(0, (0, common_1.Inject)("SIZES_REPOSITORY")),
+    __metadata("design:paramtypes", [Object])
 ], SizeService);
 //# sourceMappingURL=size.service.js.map

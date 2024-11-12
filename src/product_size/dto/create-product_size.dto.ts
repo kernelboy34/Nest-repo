@@ -6,8 +6,8 @@ export class CreateProductSizeDto {
     @ApiProperty({example: 1, description: "Id del producto"})
     products_idproducts:number
 
-    @IsInt()
-    @IsNotEmpty()
+    @IsInt({message: "el id del tamaño debe ser un entero"})
+    @IsNotEmpty({message: "El id del productos no debe estar vacio"})
     @ApiProperty({example: 1, description: "Id de un nuevo tamaño"})
     sizes_idsizes:number
 

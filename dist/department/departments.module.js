@@ -10,14 +10,19 @@ exports.DepartmentsModule = void 0;
 const common_1 = require("@nestjs/common");
 const departments_service_1 = require("./departments.service");
 const departments_controller_1 = require("./departments.controller");
-const prisma_service_1 = require("../prisma/prisma.service");
+const departments_provider_1 = require("./provider/departments.provider");
+const sequelize_1 = require("@nestjs/sequelize");
+const department_entity_1 = require("./entities/department.entity");
+const sequelize_provider_1 = require("../sequelize/sequelize.provider");
+const rols_module_1 = require("../rol/rols.module");
 let DepartmentsModule = class DepartmentsModule {
 };
 exports.DepartmentsModule = DepartmentsModule;
 exports.DepartmentsModule = DepartmentsModule = __decorate([
     (0, common_1.Module)({
         controllers: [departments_controller_1.DepartmentsController],
-        providers: [departments_service_1.DepartmentsService, prisma_service_1.PrismaService],
+        providers: [departments_service_1.DepartmentsService, ...departments_provider_1.departmentsProvider],
+        imports: [sequelize_1.SequelizeModule.forFeature([department_entity_1.Department]), sequelize_provider_1.SequelizeProvider, rols_module_1.RolsModule],
         exports: [departments_service_1.DepartmentsService]
     })
 ], DepartmentsModule);

@@ -4,37 +4,16 @@ import { UpdateSizeDto } from './dto/update-size.dto';
 export declare class SizeController {
     private readonly sizesService;
     constructor(sizesService: SizeService);
-    create(createSizeDto: CreateSizeDto): Promise<{
-        name: string | null;
-        is_deleted: number | null;
-        idsizes: number;
-    }>;
-    findAll(): Promise<{
-        name: string | null;
-        is_deleted: number | null;
-        idsizes: number;
-    }[]>;
-    findOne(id: string): Promise<{
-        product_sizes: {
-            is_deleted: number | null;
-            idproduct_sizes: number;
-            products_idproducts: number;
-            sizes_idsizes: number;
-            amount: import("@prisma/client/runtime/library").Decimal | null;
-        }[];
-    } & {
-        name: string | null;
-        is_deleted: number | null;
-        idsizes: number;
-    }>;
+    create(createSizeDto: CreateSizeDto): Promise<import("./entities/size.entity").Size>;
+    findAll(): Promise<import("./entities/size.entity").Size[]>;
+    findOne(id: string): Promise<import("./entities/size.entity").Size>;
     update(id: string, updateSizeDto: UpdateSizeDto): Promise<{
-        name: string | null;
-        is_deleted: number | null;
-        idsizes: number;
+        message: string;
+        status: number;
+        data: UpdateSizeDto;
     }>;
     remove(id: string): Promise<{
-        name: string | null;
-        is_deleted: number | null;
-        idsizes: number;
+        message: string;
+        status: number;
     }>;
 }

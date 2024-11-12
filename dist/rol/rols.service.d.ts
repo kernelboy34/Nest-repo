@@ -1,17 +1,19 @@
-import { PrismaService } from "src/prisma/prisma.service";
 import { CreateRolsDto } from "./dto/rols.dto";
-import { rols } from "@prisma/client";
 import { UpdateRolsDto } from "./dto/rolsupdate.dto";
+import { Rol } from "./entity/rol.entity";
 export declare class RolsService {
-    private db;
-    constructor(db: PrismaService);
-    create(data: CreateRolsDto): Promise<CreateRolsDto>;
-    findOne(id: number): Promise<rols>;
-    findAll(): Promise<rols[]>;
-    updateOne(data: UpdateRolsDto, id: number): Promise<UpdateRolsDto>;
+    private rolRepository;
+    constructor(rolRepository: typeof Rol);
+    create(data: CreateRolsDto): Promise<Rol>;
+    findOne(id: number): Promise<Rol>;
+    findAll(): Promise<Rol[]>;
+    updateOne(data: UpdateRolsDto, id: number): Promise<{
+        message: string;
+        status: number;
+        data: UpdateRolsDto;
+    }>;
     deleteOne(id: number): Promise<{
-        name: string;
-        is_deleted: number | null;
-        idrols: number;
+        message: string;
+        status: number;
     }>;
 }

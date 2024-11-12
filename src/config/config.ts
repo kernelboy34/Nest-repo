@@ -11,4 +11,9 @@ export const config: Config = {
     pass: process.env.MAILER_PASSWORD,
     salt: Number(process.env.SALT),
     token: String(process.env.SECRET_TOKEN),
+    db_host: process.env.DB_HOST,
+    db_port: Number(process.env.DB_PORT),
+    db_user: process.env.DB_USER,
+    db_pass: process.env.DB_PASS,
+    db_database: process.env.DB_DATABASE
 }

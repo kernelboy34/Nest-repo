@@ -26,7 +26,7 @@ export class DepartmentsController {
 
   @Get('findAll')
   @ApiOperation({summary: "Listar todos los departamentos"})
-  @Roles('Administador', 'Usuario')
+  @Roles('Administrador', 'Usuario')
   findAll() {
     return this.departmentsService.findAll();
   }

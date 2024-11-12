@@ -1,71 +1,82 @@
-import { Injectable, NotFoundException, UsePipes} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, UsePipes} from '@nestjs/common';
 import { CreateStockDto } from './dto/create-stock.dto';
 import { UpdateStockDto } from './dto/update-stock.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { Stock } from './entities/stock.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class StockService {
-  constructor(private db: PrismaService){}
-  async create(data: CreateStockDto) {
-    try{
-      return this.db.stocks.create({
-        data
-      })
-    }catch(error){
-      console.log(error)
-    }
+  constructor(
+    @Inject("STOCKS_REPOSITORY")
+    private stockRepository: typeof Stock
+  ){}
+  async create(data: CreateStockDto): Promise<Stock>{
+    return await this.stockRepository.create({
+      branches_idbranches: data.branches_idbranches,
+      products_idproducts: data.products_idproducts,
+      quantity: data.quantity
+    })
   }
 
-  async findAll() {
-    return  await this.db.stocks.findMany() 
+  async findAll(): Promise<Stock[]>{
+    return await this.stockRepository.findAll({
+      where:{
+        is_deleted:{
+          [Op.ne]:1
+        }
+      }
+    })
   }
 
   async findOne(id: number) {
-    const stockFound = await this.db.products.findUnique({
+    const stockFound = await this.stockRepository.findOne({
       where:{
-        idproducts: id
+        idstocks:{
+          [Op.eq]: id
+        },
+        is_deleted:{
+          [Op.ne]: 1
+        }
       }
     })
     if(!stockFound){
-      throw new NotFoundException("Cantidad no encontrada")
+      throw new NotFoundException("Existencia no encontrada")
     }
     return stockFound
   }
 
   async update(id: number, data: UpdateStockDto) {
-    try{
-      return await this.db.stocks.update({
-        where:{
-          idstocks: id,
-        },
-        data
-      })
-    }catch(error){
-      if(error instanceof PrismaClientKnownRequestError){
-        if(error.code == 'P2025'){
-          throw new NotFoundException("Cantidad a actualizar no encontrada")
+    const [stockUpdate] = await this.stockRepository.update(data,{
+      where:{
+        idstocks:{
+          [Op.eq]:id
         }
       }
+    })
+
+    if(stockUpdate === 0){
+      throw new NotFoundException("Existencia no encontrada o fue eliminada")
     }
+    return {message: "Existencia actualizado correctamente", status: 200, data: data}
   }
 
   async remove(id: number) {
-    try{
-      return await this.db.stocks.update({
+    const [stockDelete] = await this.stockRepository.update(
+      { is_deleted: 1 },
+      {
         where:{
-          idstocks: id
-        },
-        data:{
-          is_deleted: 1
-        }
-      })
-    }catch(error){
-      if(error instanceof PrismaClientKnownRequestError){
-        if(error.code == 'P2025'){
-          throw new NotFoundException("Cantidad no encontrada o fue eliminada")
+          idstocks:{
+            [Op.eq]:id
+          },
+          is_deleted: {
+            [Op.ne]: 1
+          }
         }
       }
+    )
+    if(stockDelete === 0){
+      throw new NotFoundException("Existencia a eliminar no encontrada")
     }
+    return {message: "Existencia eliminado correctamente", status: 200}
   }
 }

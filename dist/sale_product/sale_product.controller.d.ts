@@ -4,44 +4,16 @@ import { UpdateSaleProductDto } from './dto/update-sale_product.dto';
 export declare class SaleProductController {
     private readonly saleProductService;
     constructor(saleProductService: SaleProductService);
-    create(createSaleProductDto: CreateSaleProductDto): Promise<{
-        is_deleted: number | null;
-        products_idproducts: number;
-        sales_idsales: number;
-        total_price: import("@prisma/client/runtime/library").Decimal | null;
-        quantity: string;
-        idsale_products: number;
-    }>;
-    findAll(): Promise<{
-        is_deleted: number | null;
-        products_idproducts: number;
-        sales_idsales: number;
-        total_price: import("@prisma/client/runtime/library").Decimal | null;
-        quantity: string;
-        idsale_products: number;
-    }[]>;
-    findOne(id: string): Promise<{
-        is_deleted: number | null;
-        products_idproducts: number;
-        sales_idsales: number;
-        total_price: import("@prisma/client/runtime/library").Decimal | null;
-        quantity: string;
-        idsale_products: number;
-    }>;
+    create(createSaleProductDto: CreateSaleProductDto): Promise<import("./entities/sale_product.entity").SaleProduct>;
+    findAll(): Promise<import("./entities/sale_product.entity").SaleProduct[]>;
+    findOne(id: string): Promise<import("./entities/sale_product.entity").SaleProduct>;
     update(id: number, updateSaleProductDto: UpdateSaleProductDto): Promise<{
-        is_deleted: number | null;
-        products_idproducts: number;
-        sales_idsales: number;
-        total_price: import("@prisma/client/runtime/library").Decimal | null;
-        quantity: string;
-        idsale_products: number;
+        message: string;
+        status: number;
+        data: UpdateSaleProductDto;
     }>;
     remove(id: number): Promise<{
-        is_deleted: number | null;
-        products_idproducts: number;
-        sales_idsales: number;
-        total_price: import("@prisma/client/runtime/library").Decimal | null;
-        quantity: string;
-        idsale_products: number;
+        message: string;
+        status: number;
     }>;
 }

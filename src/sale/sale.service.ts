@@ -1,74 +1,81 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { Sale } from './entities/sale.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class SaleService {
-  constructor(private db: PrismaService){}
-  async create(data: CreateSaleDto) {
-    try{
-      return this.db.sales.create({
-        data
-      })
-    }catch(error){
-      console.log(error)
-    }
+  constructor(
+    @Inject("SALES_REPOSITORY")
+    private saleRepository: typeof Sale
+  ){}
+  async create(data: CreateSaleDto): Promise<Sale>{
+    return await this.saleRepository.create({
+      user_iduser: data.user_iduser,
+      status: data.status
+    })
   }
 
-  async findAll() {
-    return  await this.db.sales.findMany() 
-  }
-
-  async findOne(id: number) {
-    const saleFound = await this.db.sales.findUnique({
+  async findAll(): Promise<Sale[]> {
+    return await this.saleRepository.findAll({
       where:{
-        idsales:id
+        is_deleted:{
+          [Op.ne]:1
+        }
       }
     })
+  }
+
+  async findOne(id: number):Promise<Sale> {
+    const saleFound = await this.saleRepository.findOne({
+      where:{
+        idsales:{
+          [Op.eq]:id
+        },
+        is_deleted:{
+          [Op.ne]:1
+        }
+      }
+    })
+
     if(!saleFound){
-      throw new NotFoundException("Venta no encotrado")
+      throw new NotFoundException("Venta no encontrada")
     }
+
     return saleFound
   }
 
-  async update(id: number, data: UpdateSaleDto) {
-    try{
-      return await this.db.sales.update({
-        where:{
-          idsales: id,
-        },
-        data
-      })
-    }catch(error){
-      if(error instanceof PrismaClientKnownRequestError){
-        if(error.code === 'P2025'){
-          throw new NotFoundException("Venta no encontrado")
+  async update(id: number, data: UpdateSaleDto){
+    const [saleUpdate] = await this.saleRepository.update(data, {
+      where:{
+        idsales:{
+          [Op.eq]:id
         }
       }
+    })
+
+    if(saleUpdate === 0){
+      throw new NotFoundException("Venta a actualizar no encontrada o fue eliminada")
     }
+    return {message: "Venta actualizada correctamente", status: 200, data}
   }
 
   async remove(id: number) {
-    try{
-      return await this.db.sales.update({
+    const [saleRemove] = await this.saleRepository.update(
+      {is_deleted: 1},
+      {
         where:{
-          idsales: id,
-          NOT:{
-            is_deleted: 1
+          idsales:{
+            [Op.eq]: id
           }
-        },
-        data:{
-          is_deleted: 1
-        }
-      })
-    }catch(error){
-      if(error instanceof PrismaClientKnownRequestError){
-        if(error.code === 'P2025'){
-          throw new NotFoundException("Venta no fue encontrada o fue eliminada")
         }
       }
+    )
+    if(saleRemove === 0){
+      throw new NotFoundException("Venta no encontrada")
     }
+    
+    return {message: "Venta eliminada correctamente", status: 200}
   }
 }

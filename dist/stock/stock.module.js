@@ -10,15 +10,20 @@ exports.StockModule = void 0;
 const common_1 = require("@nestjs/common");
 const stock_service_1 = require("./stock.service");
 const stock_controller_1 = require("./stock.controller");
-const prisma_service_1 = require("../prisma/prisma.service");
 const rols_guard_1 = require("../rol/rols.guard");
+const sequelize_1 = require("@nestjs/sequelize");
+const stock_entity_1 = require("./entities/stock.entity");
+const sequelize_provider_1 = require("../sequelize/sequelize.provider");
+const stock_provider_1 = require("./provider/stock.provider");
+const rols_module_1 = require("../rol/rols.module");
 let StockModule = class StockModule {
 };
 exports.StockModule = StockModule;
 exports.StockModule = StockModule = __decorate([
     (0, common_1.Module)({
         controllers: [stock_controller_1.StockController],
-        providers: [stock_service_1.StockService, prisma_service_1.PrismaService, rols_guard_1.RolesGuard],
+        providers: [stock_service_1.StockService, rols_guard_1.RolesGuard, ...stock_provider_1.stockProvider],
+        imports: [sequelize_1.SequelizeModule.forFeature([stock_entity_1.Stock]), sequelize_provider_1.SequelizeProvider, rols_module_1.RolsModule]
     })
 ], StockModule);
 //# sourceMappingURL=stock.module.js.map

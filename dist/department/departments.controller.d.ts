@@ -4,24 +4,16 @@ import { UpdateDepartmentDto } from './dto/update-department.dto';
 export declare class DepartmentsController {
     private readonly departmentsService;
     constructor(departmentsService: DepartmentsService);
-    create(createDepartmentDto: CreateDepartmentDto): Promise<CreateDepartmentDto>;
-    findAll(): Promise<CreateDepartmentDto[]>;
-    findOne(id: string): Promise<{
-        name: string;
-        is_deleted: number | null;
-        address: string;
-        iddepartments: number;
-    }>;
+    create(createDepartmentDto: CreateDepartmentDto): Promise<import("./entities/department.entity").Department>;
+    findAll(): Promise<import("./entities/department.entity").Department[]>;
+    findOne(id: string): Promise<import("./entities/department.entity").Department>;
     update(id: string, updateDepartmentDto: UpdateDepartmentDto): Promise<{
-        name: string;
-        is_deleted: number | null;
-        address: string;
-        iddepartments: number;
+        message: string;
+        status: number;
+        data: UpdateDepartmentDto;
     }>;
     remove(id: string): Promise<{
-        name: string;
-        is_deleted: number | null;
-        address: string;
-        iddepartments: number;
+        message: string;
+        status: number;
     }>;
 }

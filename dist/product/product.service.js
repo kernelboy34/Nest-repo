@@ -8,101 +8,132 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../prisma/prisma.service");
-const library_1 = require("@prisma/client/runtime/library");
+const create_product_dto_1 = require("./dto/create-product.dto");
+const update_product_dto_1 = require("./dto/update-product.dto");
+const sequelize_1 = require("sequelize");
 let ProductService = class ProductService {
-    constructor(db) {
-        this.db = db;
+    constructor(productRepository) {
+        this.productRepository = productRepository;
     }
     async create(data) {
-        try {
-            return await this.db.products.create({
-                data
-            });
-        }
-        catch (error) {
-            console.log(error);
-        }
+        return await this.productRepository.create({
+            name: data.name,
+            imageUrl: data.imageUrl,
+            unitPrice: data.unitPrice
+        });
     }
     async findAll() {
-        return await this.db.products.findMany({
+        return await this.productRepository.findAll({
             where: {
-                is_deleted: 0,
-            },
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
+                }
+            }
         });
     }
     async findOne(id) {
-        const productFound = await this.db.products.findUnique({
+        const productFound = await this.productRepository.findOne({
             where: {
-                idproducts: id
+                idproducts: {
+                    [sequelize_1.Op.eq]: id
+                },
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
+                }
             }
         });
         if (!productFound) {
-            throw new common_1.NotFoundException("Producto no encontrado");
+            throw new common_1.NotFoundException("Producto no encontrado o fue eliminado");
         }
         return productFound;
     }
     async paginateProducts(take, skip) {
-        return await this.db.products.findMany({
-            skip: skip,
-            take: take,
+        return await this.productRepository.findAll({
             where: {
-                is_deleted: 0,
-            }
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
+                },
+            },
+            offset: skip,
+            limit: take
         });
     }
     async update(id, data) {
-        try {
-            return await this.db.products.update({
-                where: {
-                    idproducts: id,
-                },
-                data
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code == 'P2025') {
-                    throw new common_1.NotFoundException("Producto no encontrado");
+        const [productUpdate] = await this.productRepository.update(data, {
+            where: {
+                idproducts: {
+                    [sequelize_1.Op.eq]: id
                 }
             }
+        });
+        if (productUpdate === 0) {
+            throw new common_1.NotFoundException("Producto no encontrado");
         }
+        return { message: "Producto actualizado correctamente", status: 200, data };
     }
     async remove(id) {
-        try {
-            return await this.db.products.update({
-                where: {
-                    idproducts: id,
-                    NOT: {
-                        is_deleted: 1
-                    }
+        const [productDelete] = await this.productRepository.update({ is_deleted: 1 }, {
+            where: {
+                idproducts: {
+                    [sequelize_1.Op.eq]: id
                 },
-                data: {
-                    is_deleted: 1
-                }
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code == 'P2025') {
-                    throw new common_1.NotFoundException("Producto no encontrado o fue eliminado");
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
                 }
             }
+        });
+        if (productDelete === 0) {
+            throw new common_1.NotFoundException("Producto no encontrado o fue eliminado");
         }
+        return { message: "Producto eliminado correctamente", status: 200 };
     }
 };
 exports.ProductService = ProductService;
 __decorate([
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true, transformOptions: { enableImplicitConversion: true } })),
     __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_product_dto_1.CreateProductDto]),
+    __metadata("design:returntype", Promise)
+], ProductService.prototype, "create", null);
+__decorate([
+    (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true, transformOptions: { enableImplicitConversion: true } })),
+    __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], ProductService.prototype, "findAll", null);
+__decorate([
+    (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true, transformOptions: { enableImplicitConversion: true } })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], ProductService.prototype, "findOne", null);
+__decorate([
+    (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true, transformOptions: { enableImplicitConversion: true } })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Number]),
+    __metadata("design:returntype", Promise)
+], ProductService.prototype, "paginateProducts", null);
+__decorate([
+    (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true, transformOptions: { enableImplicitConversion: true } })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, update_product_dto_1.UpdateProductDto]),
+    __metadata("design:returntype", Promise)
+], ProductService.prototype, "update", null);
+__decorate([
+    (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true, transformOptions: { enableImplicitConversion: true } })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], ProductService.prototype, "remove", null);
 exports.ProductService = ProductService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __param(0, (0, common_1.Inject)("PRODUCTS_REPOSITORY")),
+    __metadata("design:paramtypes", [Object])
 ], ProductService);
 //# sourceMappingURL=product.service.js.map

@@ -1,71 +1,78 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { Department } from './entities/department.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class DepartmentsService {
-  constructor(private db: PrismaService){}
-  async create(data: CreateDepartmentDto): Promise<CreateDepartmentDto> {
-    return await this.db.departments.create({
-      data
+  constructor(
+    @Inject("DEPARTMENTS_REPOSITORY")
+    private deparmentRepository: typeof Department
+  ){}
+  async create(data: CreateDepartmentDto): Promise<Department>{
+    return await this.deparmentRepository.create({
+      name: data.name,
+      address: data.address
     })
   }
 
-  async findAll(): Promise<CreateDepartmentDto[]>{
-    return await this.db.departments.findMany()
+  async findAll(): Promise<Department[]>{
+    return await this.deparmentRepository.findAll({
+      where:{
+        is_deleted:{
+          [Op.ne]:1
+        }
+      }
+    })
   }
 
   async findOne(id: number) {
-    const DepartmentFound = await this.db.departments.findFirst({
+    const departmentFound = await this.deparmentRepository.findOne({
       where:{
-        iddepartments: id
+        iddepartments:{
+          [Op.eq]:id
+        }
       }
     })
-
-    if(!DepartmentFound){
+    if(!departmentFound){
       throw new NotFoundException("Departamento no encontrado")
     }
-    return DepartmentFound
+
+    return departmentFound
   }
 
   async update(id: number, data: UpdateDepartmentDto) {
-    try{
-      return await this.db.departments.update({
-        where:{
-          iddepartments: id,
-        },
-        data
-      })
-    }catch(error){
-      if(error instanceof PrismaClientKnownRequestError){
-        if(error.code == 'P2025'){
-          throw new NotFoundException("Departamento no encontrado")
+    const [departmentUpdate] = await this.deparmentRepository.update(data, {
+      where:{
+        iddepartments:{
+          [Op.eq]: id
         }
       }
+    })
+    if(departmentUpdate === 0){
+      throw new NotFoundException("Departamento a actualizar no encontrado")
     }
+    return {message: "Departamento actualizado correctamente", status: 200, data}
   }
 
   async delete(id: number) {
-    try{
-      return await this.db.departments.update({
-        where:{
-          iddepartments: id,
-          NOT:{
-            is_deleted: 1
-          }
+    const [departmentDelete] = await this.deparmentRepository.update(
+      { is_deleted : 1},
+      {
+      where:{
+        iddepartments:{
+          [Op.eq]: id
         },
-        data:{
-          is_deleted: 1
-        }
-      })
-    }catch(error){
-      if(error instanceof PrismaClientKnownRequestError){
-        if(error.code == 'P2025'){
-          throw new NotFoundException("Departamento no encontrado o fue eliminado")
+        is_deleted:{
+          [Op.ne]: 1
         }
       }
+    })
+    if(departmentDelete === 0){
+      throw new NotFoundException("Departamento a eliminar no encontrado")
     }
+
+    return {message: "Departamento eliminado correctamente", status: 200}
   }
 }

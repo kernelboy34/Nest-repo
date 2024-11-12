@@ -4,41 +4,16 @@ import { UpdateBillDto } from './dto/update-bill.dto';
 export declare class BillController {
     private readonly billService;
     constructor(billService: BillService);
-    create(createBillDto: CreateBillDto): Promise<{
-        is_deleted: number | null;
-        sales_idsales: number;
-        total_price: import("@prisma/client/runtime/library").Decimal | null;
-        idbills: number;
-    }>;
-    findAll(): Promise<{
-        sales: {
-            is_deleted: number | null;
-            user_iduser: number;
-            idsales: number;
-            date_sale: Date;
-            status: number | null;
-        };
-        is_deleted: number;
-        sales_idsales: number;
-        total_price: import("@prisma/client/runtime/library").Decimal;
-        idbills: number;
-    }[]>;
-    findOne(id: string): Promise<{
-        is_deleted: number | null;
-        sales_idsales: number;
-        total_price: import("@prisma/client/runtime/library").Decimal | null;
-        idbills: number;
-    }>;
+    create(createBillDto: CreateBillDto): Promise<import("./entities/bill.entity").Bill>;
+    findAll(): Promise<import("./entities/bill.entity").Bill[]>;
+    findOne(id: string): Promise<import("./entities/bill.entity").Bill>;
     update(id: string, updateBillDto: UpdateBillDto): Promise<{
-        is_deleted: number | null;
-        sales_idsales: number;
-        total_price: import("@prisma/client/runtime/library").Decimal | null;
-        idbills: number;
+        message: string;
+        status: number;
+        data: UpdateBillDto;
     }>;
     remove(id: string): Promise<{
-        is_deleted: number | null;
-        sales_idsales: number;
-        total_price: import("@prisma/client/runtime/library").Decimal | null;
-        idbills: number;
+        message: string;
+        status: number;
     }>;
 }

@@ -8,75 +8,84 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SaleProductService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../prisma/prisma.service");
-const library_1 = require("@prisma/client/runtime/library");
+const sequelize_1 = require("sequelize");
 let SaleProductService = class SaleProductService {
-    constructor(db) {
-        this.db = db;
+    constructor(saleproductsRepository) {
+        this.saleproductsRepository = saleproductsRepository;
     }
     async create(data) {
-        return await this.db.sale_products.create({
-            data
+        return await this.saleproductsRepository.create({
+            sales_idsales: data.sales_idsales,
+            products_idproducts: data.products_idproducts,
+            quantity: data.quantity,
+            total_price: data.total_price
         });
     }
     async findAll() {
-        return await this.db.sale_products.findMany();
+        return await this.saleproductsRepository.findAll({
+            where: {
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
+                }
+            }
+        });
     }
     async findOne(id) {
-        const saleProductFound = await this.db.sale_products.findUnique({
+        const saleproductFound = await this.saleproductsRepository.findOne({
             where: {
-                idsale_products: id
+                idsale_products: {
+                    [sequelize_1.Op.eq]: id
+                },
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
+                }
             }
         });
-        if (!saleProductFound) {
-            throw new common_1.NotFoundException("Venta del producto no encontrado");
+        if (!saleproductFound) {
+            throw new common_1.NotFoundException("Venta de producto no encontrado o fue eliminado");
         }
-        return saleProductFound;
+        return saleproductFound;
     }
     async update(id, data) {
-        try {
-            return await this.db.sale_products.update({
-                where: {
-                    idsale_products: id,
-                    NOT: {
-                        is_deleted: 1
-                    }
-                },
-                data
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code === 'P2025') {
-                    throw new common_1.NotFoundException("Venta del producto no encontrado");
-                }
-            }
-        }
-    }
-    async remove(id) {
-        const saleFound = await this.db.sale_products.update({
+        const [saleproductsUpdate] = await this.saleproductsRepository.update(data, {
             where: {
-                idsale_products: id,
-                NOT: {
-                    is_deleted: 1
+                idsale_products: {
+                    [sequelize_1.Op.eq]: id
                 }
-            },
-            data: {
-                is_deleted: 1
             }
         });
-        if (!saleFound) {
-            throw new common_1.NotFoundException("Venta del producto no encontrada o fue eliminada");
+        if (saleproductsUpdate === 0) {
+            throw new common_1.NotFoundException("Venta de productos a actualizar no encontrada");
         }
-        return saleFound;
+        return { message: "Venta de productos actualizado correctamente", status: 200, data };
+    }
+    async remove(id) {
+        const [saleproductsDelete] = await this.saleproductsRepository.update({ is_deleted: 1 }, {
+            where: {
+                idsale_products: {
+                    [sequelize_1.Op.eq]: id
+                },
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
+                }
+            }
+        });
+        if (saleproductsDelete === 0) {
+            throw new common_1.NotFoundException("Venta de productos no encontrado o fue eliminado");
+        }
+        return { message: "Venta de productos eliminado correctamente", status: 200 };
     }
 };
 exports.SaleProductService = SaleProductService;
 exports.SaleProductService = SaleProductService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __param(0, (0, common_1.Inject)("SALE_PRODUCTS_REPOSITORY")),
+    __metadata("design:paramtypes", [Object])
 ], SaleProductService);
 //# sourceMappingURL=sale_product.service.js.map

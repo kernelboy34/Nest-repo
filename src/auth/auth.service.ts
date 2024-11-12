@@ -16,11 +16,12 @@ export class AuthService{
         }
 
         const userRole = await this.userService.findUserRole(user.iduser);
+        console.log(userRole.role.name)
         if (!userRole) {
             throw new UnauthorizedException("El usuario no tiene un rol asignado");
         }
 
-        const payload = {sub: data, email: user.email, rol:userRole.name}
+        const payload = {sub: user.iduser, email: user.email, rol:userRole.role.name}
         return{
             access_token: await this.jwtService.signAsync(payload)
         }

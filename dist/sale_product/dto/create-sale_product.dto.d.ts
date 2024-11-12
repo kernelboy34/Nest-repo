@@ -1,7 +1,7 @@
 export declare class CreateSaleProductDto {
     sales_idsales: number;
     products_idproducts: number;
-    quantity: string;
+    quantity: number;
     total_price: number;
     is_deleted: number;
 }

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsDecimal, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
+import { IsInt, IsNotEmpty, IsNumber, IsOptional } from 'class-validator'
 export class CreateSaleProductDto {
     @IsInt({message:"El id de la venta debe ser un numero"})
     @IsNotEmpty({message:"El id de la venta no debe ser vacio"})
@@ -11,10 +11,10 @@ export class CreateSaleProductDto {
     @ApiProperty({example: 1, description: "Incersion de un id valido de producto"})
     products_idproducts: number
 
-    @IsString()
+    @IsInt()
     @IsNotEmpty({message: "la cantidad no debe ser un vacio"})
-    @ApiProperty({example: "10", description: "incersion de una cantidad valida"})
-    quantity: string
+    @ApiProperty({example: 10, description: "incersion de una cantidad valida"})
+    quantity: number
 
 
     //TODO: Puedes cambiar el IsNumber() a IsDecimal({force_decimal: false, decimal_digits:'1})

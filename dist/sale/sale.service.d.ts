@@ -1,42 +1,19 @@
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Sale } from './entities/sale.entity';
 export declare class SaleService {
-    private db;
-    constructor(db: PrismaService);
-    create(data: CreateSaleDto): Promise<{
-        is_deleted: number | null;
-        user_iduser: number;
-        idsales: number;
-        date_sale: Date;
-        status: number | null;
-    }>;
-    findAll(): Promise<{
-        is_deleted: number | null;
-        user_iduser: number;
-        idsales: number;
-        date_sale: Date;
-        status: number | null;
-    }[]>;
-    findOne(id: number): Promise<{
-        is_deleted: number | null;
-        user_iduser: number;
-        idsales: number;
-        date_sale: Date;
-        status: number | null;
-    }>;
+    private saleRepository;
+    constructor(saleRepository: typeof Sale);
+    create(data: CreateSaleDto): Promise<Sale>;
+    findAll(): Promise<Sale[]>;
+    findOne(id: number): Promise<Sale>;
     update(id: number, data: UpdateSaleDto): Promise<{
-        is_deleted: number | null;
-        user_iduser: number;
-        idsales: number;
-        date_sale: Date;
-        status: number | null;
+        message: string;
+        status: number;
+        data: UpdateSaleDto;
     }>;
     remove(id: number): Promise<{
-        is_deleted: number | null;
-        user_iduser: number;
-        idsales: number;
-        date_sale: Date;
-        status: number | null;
+        message: string;
+        status: number;
     }>;
 }

@@ -19,21 +19,21 @@ export class BillController {
   }))
   @Post('create')
   @ApiOperation({summary: "Crear una factura"})
-  @Roles('Administador')
+  @Roles('Administrador')
   create(@Body() createBillDto: CreateBillDto) {
     return this.billService.create(createBillDto);
   }
 
   @Get('findAll')
   @ApiOperation({summary: "Listar todas las facturas"})
-  @Roles('Administador', 'Usuario')
+  @Roles('Administrador', 'Usuario')
   findAll() {
     return this.billService.findAll();
   }
 
   @Get('findOne/:id')
   @ApiOperation({summary: "Listar una factura por el id"})
-  @Roles('Administador', 'Usuario')
+  @Roles('Administrador', 'Usuario')
   findOne(@Param('id') id: string) {
     return this.billService.findOne(+id);
   }
@@ -44,7 +44,7 @@ export class BillController {
   }))
   @Patch('updateOne/:id')
   @ApiOperation({summary: "Actualizar una factura segun el id"})
-  @Roles('Administador')
+  @Roles('Administrador')
   update(@Param('id') id: string, @Body() updateBillDto: UpdateBillDto) {
     return this.billService.update(+id, updateBillDto);
   }
@@ -55,7 +55,7 @@ export class BillController {
   }))
   @Delete('deleteOne/:id')
   @ApiOperation({summary: "Eliminar una factura segun el id"})
-  @Roles('Administador')
+  @Roles('Administrador')
   remove(@Param('id') id: string) {
     return this.billService.remove(+id);
   }

@@ -9,15 +9,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RolsModule = void 0;
 const common_1 = require("@nestjs/common");
 const rols_controller_1 = require("./rols.controller");
-const prisma_service_1 = require("../prisma/prisma.service");
 const rols_service_1 = require("./rols.service");
+const rols_provider_1 = require("./provider/rols.provider");
+const sequelize_1 = require("@nestjs/sequelize");
+const rol_entity_1 = require("./entity/rol.entity");
+const sequelize_provider_1 = require("../sequelize/sequelize.provider");
 let RolsModule = class RolsModule {
 };
 exports.RolsModule = RolsModule;
 exports.RolsModule = RolsModule = __decorate([
     (0, common_1.Module)({
         controllers: [rols_controller_1.RolsController],
-        providers: [prisma_service_1.PrismaService, rols_service_1.RolsService]
+        providers: [rols_service_1.RolsService, ...rols_provider_1.rolProvider],
+        imports: [
+            sequelize_1.SequelizeModule.forFeature([rol_entity_1.Rol]),
+            sequelize_provider_1.SequelizeProvider
+        ],
+        exports: [RolsModule, ...rols_provider_1.rolProvider]
     })
 ], RolsModule);
 //# sourceMappingURL=rols.module.js.map

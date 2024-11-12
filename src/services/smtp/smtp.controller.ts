@@ -14,7 +14,6 @@ export class EmailController {
     if (!isValidDomain) {
       throw new HttpException('El dominio del correo no está permitido.', HttpStatus.FORBIDDEN);
     }
-     //no estoy mostrando datos sencibles en el error pa que no se muestre nada
     try {
       await this.smtpService.sendMail(sendEmailDto.to, sendEmailDto.subject, sendEmailDto.text);
       return { message: 'Correo enviado exitosamente' };

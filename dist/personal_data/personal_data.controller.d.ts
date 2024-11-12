@@ -4,54 +4,16 @@ import { UpdatePersonalDatumDto } from './dto/update-personal_datum.dto';
 export declare class PersonalDataController {
     private readonly personalDataService;
     constructor(personalDataService: PersonalDataService);
-    create(data: CreatePersonalDatumDto): Promise<{
-        name: string;
-        is_deleted: number | null;
-        address: string | null;
-        user_iduser: number;
-        lastname: string;
-        bank_account: string;
-        phone: string | null;
-        idpersonal_data: number;
-    }>;
-    findAll(): Promise<{
-        name: string;
-        is_deleted: number | null;
-        address: string | null;
-        user_iduser: number;
-        lastname: string;
-        bank_account: string;
-        phone: string | null;
-        idpersonal_data: number;
-    }[]>;
-    findOne(id: string): Promise<{
-        name: string;
-        is_deleted: number | null;
-        address: string | null;
-        user_iduser: number;
-        lastname: string;
-        bank_account: string;
-        phone: string | null;
-        idpersonal_data: number;
-    }>;
+    create(data: CreatePersonalDatumDto): Promise<import("./entities/personal_datum.entity").PersonalDatum>;
+    findAll(): Promise<import("./entities/personal_datum.entity").PersonalDatum[]>;
+    findOne(id: string): Promise<import("./entities/personal_datum.entity").PersonalDatum>;
     update(id: string, updatePersonalDatumDto: UpdatePersonalDatumDto): Promise<{
-        name: string;
-        is_deleted: number | null;
-        address: string | null;
-        user_iduser: number;
-        lastname: string;
-        bank_account: string;
-        phone: string | null;
-        idpersonal_data: number;
+        message: string;
+        status: number;
+        data: UpdatePersonalDatumDto;
     }>;
     remove(id: string): Promise<{
-        name: string;
-        is_deleted: number | null;
-        address: string | null;
-        user_iduser: number;
-        lastname: string;
-        bank_account: string;
-        phone: string | null;
-        idpersonal_data: number;
+        message: string;
+        status: number;
     }>;
 }

@@ -48,7 +48,7 @@ __decorate([
     })),
     (0, common_1.Post)('create'),
     (0, swagger_1.ApiOperation)({ summary: "Crear un nuevo dato personal" }),
-    (0, rol_decorator_1.Roles)('Administrador'),
+    (0, rol_decorator_1.Roles)('Administrador', 'Usuario'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_personal_datum_dto_1.CreatePersonalDatumDto]),
@@ -57,7 +57,7 @@ __decorate([
 __decorate([
     (0, common_1.Get)('findAll'),
     (0, swagger_1.ApiOperation)({ summary: "Listar todos los datos personal" }),
-    (0, rol_decorator_1.Roles)('Administrador', 'Usuario'),
+    (0, rol_decorator_1.Roles)('Administrador'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
@@ -78,7 +78,7 @@ __decorate([
     })),
     (0, common_1.Patch)('updateOne/:id'),
     (0, swagger_1.ApiOperation)({ summary: "Actualizar un dato personal segun el id" }),
-    (0, rol_decorator_1.Roles)('Usuario'),
+    (0, rol_decorator_1.Roles)('Usuario', 'Administrador'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),

@@ -1,11 +1,11 @@
 import { Controller, Get, Put, Post, Patch, Delete, Body, Param, UsePipes, ValidationPipe, UseGuards} from "@nestjs/common";
 import { RolsService } from "./rols.service";
-import { rols } from "@prisma/client";
 import { CreateRolsDto } from "./dto/rols.dto";
 import { UpdateRolsDto } from "./dto/rolsupdate.dto";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Roles } from "./decorators/rol.decorator";
 import { RolesGuard } from "./rols.guard";
+import { Rol } from "./entity/rol.entity";
 
 @ApiBearerAuth()
 @Controller("rols")
@@ -18,7 +18,7 @@ export class RolsController{
     @Post('create')
     @ApiOperation({summary: "Creat un nuevo rol"})
     @Roles('Administrador')
-    create(@Body() data: CreateRolsDto){
+    create(@Body() data: CreateRolsDto): Promise<Rol>{
         return this.rolsService.create(data)
     }
 

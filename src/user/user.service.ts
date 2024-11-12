@@ -1,57 +1,44 @@
-import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { Prisma, user } from "@prisma/client";
-import { PrismaService } from "src/prisma/prisma.service";
+import { ConflictException, Inject, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { CreateUserDto } from "./dto/createUser.dto";
 import { UpdateUserDto } from "./dto/updateUser.dto";
 import { email } from "src/constants/VerifyEmails.constant";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import * as bt from 'bcrypt'
 import {config} from '../config/config'
+import { Op } from "sequelize";
+import { User } from "./entity/user.entity";
+import { Rol } from "src/rol/entity/rol.entity";
 
 @Injectable()
 export class UserService{
-    constructor(private db: PrismaService){}
+    constructor(
+        @Inject('USERS_REPOSITORY')
+        private userRepository: typeof User
+    ){}
 
-    async create(data: CreateUserDto):Promise<CreateUserDto>{
+    async create(data: CreateUserDto): Promise<User>{
         let ValidEmail = false
-            email.forEach(emails => {
-                if(data.email.endsWith(emails)){
-                    ValidEmail = true
-                }
-            })
-            if(!ValidEmail){
-                throw new UnauthorizedException("Dominio de correo no permitido")
+        email.forEach(emails => {
+            if(data.email.endsWith(emails)){
+                ValidEmail = true
             }
-        try{
-            data.password = await bt.hash(data.password, config.salt)
-            return await this.db.user.create({
-                data
-            })
-        }catch(error){
-            console.log(error)
-            if(error instanceof Prisma.PrismaClientKnownRequestError){
-                if(error.code === "p2002"){
-                    throw new ConflictException("El correo ya esta en uso")
-                }
-                if(error.code === "P2003"){
-                    throw new ConflictException("Rol no permitido")
-                }
-            }
+        })
+        if(!ValidEmail){
+            throw new UnauthorizedException("Dominio de correo no permitido")
         }
+        data.password = await bt.hash(data.password, config.salt)
+        return await this.userRepository.create({
+            name: data.name,
+            email: data.email,
+            password: data.password,
+            rols_idrols: data.rols_idrols
+        })
     }
 
-    async findOne(email: string):Promise<Omit<user,'password'>>{
-        const UserFound = await this.db.user.findUnique({
+    async findOne(email: string){
+        const UserFound = await this.userRepository.findOne({
             where:{
                 email:email
             },
-            select:{
-                iduser: true,
-                rols_idrols:true,
-                name: true,
-                email: true,
-                is_deleted:true,
-            }
         })
         if(!UserFound){
             throw new NotFoundException("Usuario no encontrado")
@@ -59,30 +46,31 @@ export class UserService{
         return await UserFound
     }
 
-    async findAll():Promise<Omit<user, 'password'>[]>{
-        return await this.db.user.findMany({
-            select:{
-                iduser:true,
-                rols_idrols: true,
-                name: true,
-                email:true,
-                is_deleted: true,
-                rols: true
-            }
-        })
+    async findAll(): Promise<User[]>{
+        return await this.userRepository.findAll()
     }
 
     async findUserRole(userId: number) {
-        return this.db.rols.findFirst({
-            where: { user: { some: { iduser: userId } } }
+        return await this.userRepository.findOne({
+            where:{
+                iduser:{
+                    [Op.eq]:userId
+                }
+            },
+            include:[{model:Rol}]
         });
     }
 
-    async findOneToLogin(email: string) : Promise<user>{
-        const userFound = await this.db.user.findUnique({
+    async findOneToLogin(email: string){
+        const userFound = await this.userRepository.findOne({
             where:{
-                email: email
-            }
+                email: {
+                    [Op.eq]:email
+                },
+                is_deleted:{
+                    [Op.ne]:1
+                }
+            },
         })
         if(!userFound){
             throw new NotFoundException("Usuario no encontrado")
@@ -90,44 +78,37 @@ export class UserService{
         return await userFound
     }
 
-    async update(data: UpdateUserDto, id: number): Promise<UpdateUserDto>{
-        try{
-            return await this.db.user.update({
-                where:{
-                    iduser: id,
-                },
-                data:{
-                    ...data
-                }
-            })
-        }catch(error){
-            if(error instanceof PrismaClientKnownRequestError){
-                if(error.code == 'P2025'){
-                    throw new NotFoundException("Usuario a actualizar no encontrada")
+    async update(data: UpdateUserDto, id: number){
+        const [userUpdate] = await this.userRepository.update(data, {
+            where:{
+                iduser:{
+                    [Op.eq]:id
                 }
             }
+        })
+
+        if(userUpdate === 0){
+            throw new NotFoundException("Usuario a actualizar no fue encontrado")
         }
+
+        return {message: "Usuario actualizado correctamente", status: 200, data}
     }
 
-    async delete(id: number): Promise<user>{
-        try{
-            return await this.db.user.update({
+    async delete(id: number){
+        const [userDelete] = await this.userRepository.update(
+            { is_deleted: 1},
+            {
                 where:{
-                    iduser: id,
-                    NOT:{
-                        is_deleted: 1
+                    iduser:id,
+                    is_deleted:{
+                        [Op.ne]:1
                     }
-                },
-                data:{
-                    is_deleted: 1
-                }
-            })
-        }catch(error){
-            if(error instanceof PrismaClientKnownRequestError){
-                if(error.code == "P2025"){
-                    throw new NotFoundException("Usuario no encontrado o fue eliminado")
                 }
             }
+        )
+        if(userDelete === 0){
+            throw new NotFoundException("Usuario eliminado o fue eliminado")
         }
+        return {message: "Usuario eliminado correctamente", status: 200}
     }
 }

@@ -8,35 +8,38 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BillService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../prisma/prisma.service");
-const library_1 = require("@prisma/client/runtime/library");
+const sequelize_1 = require("sequelize");
 let BillService = class BillService {
-    constructor(db) {
-        this.db = db;
+    constructor(billRepository) {
+        this.billRepository = billRepository;
     }
     async create(data) {
-        return await this.db.bills.create({
-            data
+        return await this.billRepository.create({
+            sales_idsales: data.sales_idsales,
+            total_price: data.total_price
         });
     }
     async findAll() {
-        return await this.db.bills.findMany({
-            select: {
-                idbills: true,
-                is_deleted: true,
-                total_price: true,
-                sales_idsales: true,
-                sales: true,
+        return await this.billRepository.findAll({
+            where: {
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
+                }
             }
         });
     }
     async findOne(id) {
-        const billFound = await this.db.bills.findUnique({
+        const billFound = await this.billRepository.findOne({
             where: {
-                idbills: id
+                idbills: {
+                    [sequelize_1.Op.eq]: id
+                }
             }
         });
         if (!billFound) {
@@ -45,48 +48,39 @@ let BillService = class BillService {
         return billFound;
     }
     async update(id, data) {
-        try {
-            return await this.db.bills.update({
-                where: {
-                    idbills: id,
-                },
-                data
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code == 'P2025') {
-                    throw new common_1.NotFoundException("Factura no encontrada");
+        const billUpdate = await this.billRepository.update(data, {
+            where: {
+                idbills: {
+                    [sequelize_1.Op.eq]: id
                 }
             }
+        });
+        if (!billUpdate) {
+            throw new common_1.NotFoundException("Factura a actualizar no encontrado");
         }
+        return { message: "Factura actualizado correctamente", status: 200, data };
     }
     async remove(id) {
-        try {
-            return await this.db.bills.update({
-                where: {
-                    idbills: id,
-                    NOT: {
-                        is_deleted: 1
-                    }
+        const [billDelete] = await this.billRepository.update({ is_deleted: 1 }, {
+            where: {
+                idbills: {
+                    [sequelize_1.Op.eq]: id
                 },
-                data: {
-                    is_deleted: 1
-                }
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code == 'P2025') {
-                    throw new common_1.NotFoundException("Factura no encontrada o fue eliminada");
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
                 }
             }
+        });
+        if (billDelete === 0) {
+            throw new common_1.NotFoundException("Factura a eliminar no encontrado");
         }
+        return { message: "Factura eliminado correctamente", status: 200 };
     }
 };
 exports.BillService = BillService;
 exports.BillService = BillService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __param(0, (0, common_1.Inject)("BILLS_REPOSITORY")),
+    __metadata("design:paramtypes", [Object])
 ], BillService);
 //# sourceMappingURL=bill.service.js.map

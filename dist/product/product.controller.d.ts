@@ -5,47 +5,18 @@ import { Response } from 'express';
 export declare class ProductController {
     private readonly productService;
     constructor(productService: ProductService);
-    create(file: Express.Multer.File, createProductDto: CreateProductDto): Promise<{
-        name: string | null;
-        is_deleted: number | null;
-        idproducts: number;
-        imageUrl: string | null;
-        unitPrice: import("@prisma/client/runtime/library").Decimal | null;
-    }>;
-    findAll(): Promise<{
-        name: string | null;
-        is_deleted: number | null;
-        idproducts: number;
-        imageUrl: string | null;
-        unitPrice: import("@prisma/client/runtime/library").Decimal | null;
-    }[]>;
-    findOne(id: string): Promise<{
-        name: string | null;
-        is_deleted: number | null;
-        idproducts: number;
-        imageUrl: string | null;
-        unitPrice: import("@prisma/client/runtime/library").Decimal | null;
-    }>;
-    paginateProduct(take: number, skip: number): Promise<{
-        name: string | null;
-        is_deleted: number | null;
-        idproducts: number;
-        imageUrl: string | null;
-        unitPrice: import("@prisma/client/runtime/library").Decimal | null;
-    }[]>;
+    create(file: Express.Multer.File, createProductDto: CreateProductDto): Promise<import("./entities/product.entity").Product>;
+    findAll(): Promise<import("./entities/product.entity").Product[]>;
+    findOne(id: string): Promise<import("./entities/product.entity").Product>;
+    paginateProduct(take: number, skip: number): Promise<import("./entities/product.entity").Product[]>;
     fetchByIdWithImage(id: string, res: Response): Promise<Response<any, Record<string, any>>>;
     update(id: string, updateProductDto: UpdateProductDto): Promise<{
-        name: string | null;
-        is_deleted: number | null;
-        idproducts: number;
-        imageUrl: string | null;
-        unitPrice: import("@prisma/client/runtime/library").Decimal | null;
+        message: string;
+        status: number;
+        data: UpdateProductDto;
     }>;
     remove(id: string): Promise<{
-        name: string | null;
-        is_deleted: number | null;
-        idproducts: number;
-        imageUrl: string | null;
-        unitPrice: import("@prisma/client/runtime/library").Decimal | null;
+        message: string;
+        status: number;
     }>;
 }

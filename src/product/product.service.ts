@@ -1,90 +1,101 @@
-import { Injectable, NotFoundException, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { Prisma } from '@prisma/client';
+import { Product } from './entities/product.entity';
+import { Op, where } from 'sequelize';
 
 @Injectable()
 export class ProductService {
-  constructor(private db: PrismaService){}
-  async create(data: CreateProductDto) {
-    try{
-      return await this.db.products.create({
-        data
-      })
-    }catch(error){
-      console.log(error)
-    }
+  constructor(
+    @Inject("PRODUCTS_REPOSITORY")
+    private productRepository: typeof Product
+  ){}
+
+  @UsePipes(new ValidationPipe({transform: true, transformOptions:{enableImplicitConversion:true}}))
+  async create(data: CreateProductDto): Promise<Product>{
+    return await this.productRepository.create({
+      name: data.name,
+      imageUrl: data.imageUrl,
+      unitPrice: data.unitPrice
+    })
   }
 
   @UsePipes(new ValidationPipe({transform: true, transformOptions:{enableImplicitConversion:true}}))
-  async findAll() {
-    return await this.db.products.findMany({
-      where: {
-        is_deleted: 0,
-      },
-    });
+  async findAll(): Promise<Product[]>{
+    return await this.productRepository.findAll({
+      where:{
+        is_deleted:{
+          [Op.ne]: 1
+        }
+      }
+    })
   }
   
-
-  async findOne(id: number) {
-    const productFound = await this.db.products.findUnique({
+  @UsePipes(new ValidationPipe({transform: true, transformOptions:{enableImplicitConversion:true}}))
+  async findOne(id: number):Promise<Product>{
+    const productFound = await this.productRepository.findOne({
       where:{
-        idproducts:id
+        idproducts:{
+          [Op.eq]:id
+        },
+        is_deleted:{
+          [Op.ne]: 1
+        }
       }
     })
     if(!productFound){
-      throw new NotFoundException("Producto no encontrado")
+      throw new NotFoundException("Producto no encontrado o fue eliminado")
     }
     return productFound
   }
 
+  @UsePipes(new ValidationPipe({transform: true, transformOptions:{enableImplicitConversion:true}}))
   async paginateProducts(take: number, skip:number){
-    return await this.db.products.findMany({
-      skip: skip,
-      take: take,
+    return await this.productRepository.findAll({
       where:{
-        is_deleted: 0,
-      }
+        is_deleted:{
+          [Op.ne]:1
+        },
+      },
+      offset: skip,
+      limit: take
     })
   }
 
+  @UsePipes(new ValidationPipe({transform: true, transformOptions:{enableImplicitConversion:true}}))
   async update(id: number, data: UpdateProductDto) {
-    try{
-      return await this.db.products.update({
-        where:{
-          idproducts: id,
-        },
-        data
-      })
-    }catch(error){
-      if(error instanceof PrismaClientKnownRequestError){
-        if(error.code == 'P2025'){
-          throw new NotFoundException("Producto no encontrado")
+    const [productUpdate] = await this.productRepository.update(data,{
+      where:{
+        idproducts:{
+          [Op.eq]:id
         }
       }
+    })
+    
+    if(productUpdate === 0){
+      throw new NotFoundException("Producto no encontrado")
     }
+
+    return {message: "Producto actualizado correctamente", status:200, data}
   }
+
+  @UsePipes(new ValidationPipe({transform: true, transformOptions:{enableImplicitConversion:true}}))
   async remove(id: number) {
-    try{
-      return await this.db.products.update({
+    const [productDelete] = await this.productRepository.update(
+      {is_deleted: 1},
+      {
         where:{
-          idproducts: id,
-          NOT:{
-            is_deleted: 1
+          idproducts:{
+            [Op.eq]:id
+          },
+          is_deleted:{
+            [Op.ne]: 1
           }
-        },
-        data:{
-          is_deleted: 1
-        }
-      })
-    }catch(error){
-      if(error instanceof PrismaClientKnownRequestError){
-        if(error.code == 'P2025'){
-          throw new NotFoundException("Producto no encontrado o fue eliminado")
-        }
       }
+    })
+    if(productDelete === 0){
+      throw new NotFoundException("Producto no encontrado o fue eliminado")
     }
+    return {message: "Producto eliminado correctamente", status: 200}
   }
 }

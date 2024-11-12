@@ -1,47 +1,19 @@
 import { CreateSaleProductDto } from './dto/create-sale_product.dto';
 import { UpdateSaleProductDto } from './dto/update-sale_product.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { SaleProduct } from './entities/sale_product.entity';
 export declare class SaleProductService {
-    private db;
-    constructor(db: PrismaService);
-    create(data: CreateSaleProductDto): Promise<{
-        is_deleted: number | null;
-        products_idproducts: number;
-        sales_idsales: number;
-        total_price: import("@prisma/client/runtime/library").Decimal | null;
-        quantity: string;
-        idsale_products: number;
-    }>;
-    findAll(): Promise<{
-        is_deleted: number | null;
-        products_idproducts: number;
-        sales_idsales: number;
-        total_price: import("@prisma/client/runtime/library").Decimal | null;
-        quantity: string;
-        idsale_products: number;
-    }[]>;
-    findOne(id: number): Promise<{
-        is_deleted: number | null;
-        products_idproducts: number;
-        sales_idsales: number;
-        total_price: import("@prisma/client/runtime/library").Decimal | null;
-        quantity: string;
-        idsale_products: number;
-    }>;
+    private saleproductsRepository;
+    constructor(saleproductsRepository: typeof SaleProduct);
+    create(data: CreateSaleProductDto): Promise<SaleProduct>;
+    findAll(): Promise<SaleProduct[]>;
+    findOne(id: number): Promise<SaleProduct>;
     update(id: number, data: UpdateSaleProductDto): Promise<{
-        is_deleted: number | null;
-        products_idproducts: number;
-        sales_idsales: number;
-        total_price: import("@prisma/client/runtime/library").Decimal | null;
-        quantity: string;
-        idsale_products: number;
+        message: string;
+        status: number;
+        data: UpdateSaleProductDto;
     }>;
     remove(id: number): Promise<{
-        is_deleted: number | null;
-        products_idproducts: number;
-        sales_idsales: number;
-        total_price: import("@prisma/client/runtime/library").Decimal | null;
-        quantity: string;
-        idsale_products: number;
+        message: string;
+        status: number;
     }>;
 }

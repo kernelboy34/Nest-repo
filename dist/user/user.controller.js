@@ -51,14 +51,15 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [createUser_dto_1.CreateUserDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], UserController.prototype, "create", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: "Listar todos los usuarios" }),
+    (0, common_1.Get)('findAll'),
     (0, rol_decorator_1.Roles)('Administrador'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], UserController.prototype, "findAll", null);
 __decorate([
     (0, common_1.UsePipes)(new common_1.ValidationPipe({
@@ -67,7 +68,7 @@ __decorate([
     })),
     (0, swagger_1.ApiOperation)({ summary: "Listar un usuario por email" }),
     (0, common_1.Get)('findOne/:email'),
-    (0, rol_decorator_1.Roles)('Usuario', 'Administrador'),
+    (0, rol_decorator_1.Roles)('Administrador'),
     __param(0, (0, common_1.Param)('email')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -108,6 +109,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "deleteOne", null);
 exports.UserController = UserController = __decorate([
+    (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiTags)("Usuarios"),
     (0, common_1.Controller)('user'),
     __metadata("design:paramtypes", [user_service_1.UserService])

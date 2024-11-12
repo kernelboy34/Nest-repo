@@ -10,18 +10,27 @@ exports.UserModule = void 0;
 const common_1 = require("@nestjs/common");
 const user_controller_1 = require("./user.controller");
 const user_service_1 = require("./user.service");
-const prisma_service_1 = require("../prisma/prisma.service");
-;
 const rols_guard_1 = require("../rol/rols.guard");
+const user_provider_1 = require("./providers/user.provider");
+const sequelize_1 = require("@nestjs/sequelize");
+const user_entity_1 = require("./entity/user.entity");
+const sequelize_provider_1 = require("../sequelize/sequelize.provider");
+const rols_provider_1 = require("../rol/provider/rols.provider");
+const rols_module_1 = require("../rol/rols.module");
 let UserModule = class UserModule {
 };
 exports.UserModule = UserModule;
 exports.UserModule = UserModule = __decorate([
     (0, common_1.Module)({
         controllers: [user_controller_1.UserController],
-        providers: [user_service_1.UserService, prisma_service_1.PrismaService, rols_guard_1.RolesGuard],
+        providers: [
+            user_service_1.UserService,
+            rols_guard_1.RolesGuard,
+            ...user_provider_1.usersProvider,
+            ...rols_provider_1.rolProvider
+        ],
         exports: [user_service_1.UserService],
-        imports: []
+        imports: [sequelize_1.SequelizeModule.forFeature([user_entity_1.User]), sequelize_provider_1.SequelizeProvider, rols_module_1.RolsModule]
     })
 ], UserModule);
 //# sourceMappingURL=user.module.js.map

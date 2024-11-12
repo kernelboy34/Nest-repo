@@ -8,18 +8,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const common_1 = require("@nestjs/common");
-const client_1 = require("@prisma/client");
-const prisma_service_1 = require("../prisma/prisma.service");
 const VerifyEmails_constant_1 = require("../constants/VerifyEmails.constant");
-const library_1 = require("@prisma/client/runtime/library");
 const bt = require("bcrypt");
 const config_1 = require("../config/config");
+const sequelize_1 = require("sequelize");
+const rol_entity_1 = require("../rol/entity/rol.entity");
 let UserService = class UserService {
-    constructor(db) {
-        this.db = db;
+    constructor(userRepository) {
+        this.userRepository = userRepository;
     }
     async create(data) {
         let ValidEmail = false;
@@ -31,36 +33,19 @@ let UserService = class UserService {
         if (!ValidEmail) {
             throw new common_1.UnauthorizedException("Dominio de correo no permitido");
         }
-        try {
-            data.password = await bt.hash(data.password, config_1.config.salt);
-            return await this.db.user.create({
-                data
-            });
-        }
-        catch (error) {
-            console.log(error);
-            if (error instanceof client_1.Prisma.PrismaClientKnownRequestError) {
-                if (error.code === "p2002") {
-                    throw new common_1.ConflictException("El correo ya esta en uso");
-                }
-                if (error.code === "P2003") {
-                    throw new common_1.ConflictException("Rol no permitido");
-                }
-            }
-        }
+        data.password = await bt.hash(data.password, config_1.config.salt);
+        return await this.userRepository.create({
+            name: data.name,
+            email: data.email,
+            password: data.password,
+            rols_idrols: data.rols_idrols
+        });
     }
     async findOne(email) {
-        const UserFound = await this.db.user.findUnique({
+        const UserFound = await this.userRepository.findOne({
             where: {
                 email: email
             },
-            select: {
-                iduser: true,
-                rols_idrols: true,
-                name: true,
-                email: true,
-                is_deleted: true,
-            }
         });
         if (!UserFound) {
             throw new common_1.NotFoundException("Usuario no encontrado");
@@ -68,27 +53,28 @@ let UserService = class UserService {
         return await UserFound;
     }
     async findAll() {
-        return await this.db.user.findMany({
-            select: {
-                iduser: true,
-                rols_idrols: true,
-                name: true,
-                email: true,
-                is_deleted: true,
-                rols: true
-            }
-        });
+        return await this.userRepository.findAll();
     }
     async findUserRole(userId) {
-        return this.db.rols.findFirst({
-            where: { user: { some: { iduser: userId } } }
+        return await this.userRepository.findOne({
+            where: {
+                iduser: {
+                    [sequelize_1.Op.eq]: userId
+                }
+            },
+            include: [{ model: rol_entity_1.Rol }]
         });
     }
     async findOneToLogin(email) {
-        const userFound = await this.db.user.findUnique({
+        const userFound = await this.userRepository.findOne({
             where: {
-                email: email
-            }
+                email: {
+                    [sequelize_1.Op.eq]: email
+                },
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
+                }
+            },
         });
         if (!userFound) {
             throw new common_1.NotFoundException("Usuario no encontrado");
@@ -96,50 +82,37 @@ let UserService = class UserService {
         return await userFound;
     }
     async update(data, id) {
-        try {
-            return await this.db.user.update({
-                where: {
-                    iduser: id,
-                },
-                data: {
-                    ...data
-                }
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code == 'P2025') {
-                    throw new common_1.NotFoundException("Usuario a actualizar no encontrada");
+        const [userUpdate] = await this.userRepository.update(data, {
+            where: {
+                iduser: {
+                    [sequelize_1.Op.eq]: id
                 }
             }
+        });
+        if (userUpdate === 0) {
+            throw new common_1.NotFoundException("Usuario a actualizar no fue encontrado");
         }
+        return { message: "Usuario actualizado correctamente", status: 200, data };
     }
     async delete(id) {
-        try {
-            return await this.db.user.update({
-                where: {
-                    iduser: id,
-                    NOT: {
-                        is_deleted: 1
-                    }
-                },
-                data: {
-                    is_deleted: 1
-                }
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code == "P2025") {
-                    throw new common_1.NotFoundException("Usuario no encontrado o fue eliminado");
+        const [userDelete] = await this.userRepository.update({ is_deleted: 1 }, {
+            where: {
+                iduser: id,
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
                 }
             }
+        });
+        if (userDelete === 0) {
+            throw new common_1.NotFoundException("Usuario eliminado o fue eliminado");
         }
+        return { message: "Usuario eliminado correctamente", status: 200 };
     }
 };
 exports.UserService = UserService;
 exports.UserService = UserService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __param(0, (0, common_1.Inject)('USERS_REPOSITORY')),
+    __metadata("design:paramtypes", [Object])
 ], UserService);
 //# sourceMappingURL=user.service.js.map

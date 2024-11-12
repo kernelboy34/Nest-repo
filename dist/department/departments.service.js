@@ -8,77 +8,79 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DepartmentsService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../prisma/prisma.service");
-const library_1 = require("@prisma/client/runtime/library");
+const sequelize_1 = require("sequelize");
 let DepartmentsService = class DepartmentsService {
-    constructor(db) {
-        this.db = db;
+    constructor(deparmentRepository) {
+        this.deparmentRepository = deparmentRepository;
     }
     async create(data) {
-        return await this.db.departments.create({
-            data
+        return await this.deparmentRepository.create({
+            name: data.name,
+            address: data.address
         });
     }
     async findAll() {
-        return await this.db.departments.findMany();
-    }
-    async findOne(id) {
-        const DepartmentFound = await this.db.departments.findFirst({
+        return await this.deparmentRepository.findAll({
             where: {
-                iddepartments: id
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
+                }
             }
         });
-        if (!DepartmentFound) {
+    }
+    async findOne(id) {
+        const departmentFound = await this.deparmentRepository.findOne({
+            where: {
+                iddepartments: {
+                    [sequelize_1.Op.eq]: id
+                }
+            }
+        });
+        if (!departmentFound) {
             throw new common_1.NotFoundException("Departamento no encontrado");
         }
-        return DepartmentFound;
+        return departmentFound;
     }
     async update(id, data) {
-        try {
-            return await this.db.departments.update({
-                where: {
-                    iddepartments: id,
-                },
-                data
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code == 'P2025') {
-                    throw new common_1.NotFoundException("Departamento no encontrado");
+        const [departmentUpdate] = await this.deparmentRepository.update(data, {
+            where: {
+                iddepartments: {
+                    [sequelize_1.Op.eq]: id
                 }
             }
+        });
+        if (departmentUpdate === 0) {
+            throw new common_1.NotFoundException("Departamento a actualizar no encontrado");
         }
+        return { message: "Departamento actualizado correctamente", status: 200, data };
     }
     async delete(id) {
-        try {
-            return await this.db.departments.update({
-                where: {
-                    iddepartments: id,
-                    NOT: {
-                        is_deleted: 1
-                    }
+        const [departmentDelete] = await this.deparmentRepository.update({ is_deleted: 1 }, {
+            where: {
+                iddepartments: {
+                    [sequelize_1.Op.eq]: id
                 },
-                data: {
-                    is_deleted: 1
-                }
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code == 'P2025') {
-                    throw new common_1.NotFoundException("Departamento no encontrado o fue eliminado");
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
                 }
             }
+        });
+        if (departmentDelete === 0) {
+            throw new common_1.NotFoundException("Departamento a eliminar no encontrado");
         }
+        return { message: "Departamento eliminado correctamente", status: 200 };
     }
 };
 exports.DepartmentsService = DepartmentsService;
 exports.DepartmentsService = DepartmentsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __param(0, (0, common_1.Inject)("DEPARTMENTS_REPOSITORY")),
+    __metadata("design:paramtypes", [Object])
 ], DepartmentsService);
 //# sourceMappingURL=departments.service.js.map

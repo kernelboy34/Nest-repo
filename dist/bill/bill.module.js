@@ -10,14 +10,19 @@ exports.BillModule = void 0;
 const common_1 = require("@nestjs/common");
 const bill_service_1 = require("./bill.service");
 const bill_controller_1 = require("./bill.controller");
-const prisma_service_1 = require("../prisma/prisma.service");
+const sequelize_1 = require("@nestjs/sequelize");
+const rols_module_1 = require("../rol/rols.module");
+const sequelize_provider_1 = require("../sequelize/sequelize.provider");
+const bill_entity_1 = require("./entities/bill.entity");
+const bill_provide_1 = require("./provider/bill.provide");
 let BillModule = class BillModule {
 };
 exports.BillModule = BillModule;
 exports.BillModule = BillModule = __decorate([
     (0, common_1.Module)({
         controllers: [bill_controller_1.BillController],
-        providers: [bill_service_1.BillService, prisma_service_1.PrismaService],
+        providers: [bill_service_1.BillService, ...bill_provide_1.billProvider],
+        imports: [rols_module_1.RolsModule, sequelize_1.SequelizeModule.forFeature([bill_entity_1.Bill]), sequelize_provider_1.SequelizeProvider]
     })
 ], BillModule);
 //# sourceMappingURL=bill.module.js.map

@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import { Response } from 'express';
 import * as fs from 'fs';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RolesGuard } from 'src/rol/rols.guard';
 import { Roles } from 'src/rol/decorators/rol.decorator';
 
@@ -77,17 +77,17 @@ export class ProductController {
             throw new NotFoundException("Producto no encontrado");
         }
 
-        // Define la ruta de la imagen
+        //Define la ruta de la imagen
         const imagePath = path.join(__dirname,'..','..', product.imageUrl);
         console.log(imagePath) // Ajusta según tu ruta de imagen
         if (!fs.existsSync(imagePath)) {
             return res.status(404).send('Imagen no encontrada');
         }
 
-        // Leer el archivo de imagen
+        //Leer el archivo de imagen
         const image = fs.readFileSync(imagePath);
 
-        // Enviar los datos del producto y la imagen como respuesta
+        //Enviar los datos del producto y la imagen como respuesta
         res.json({
             product,
             image: `data:image/jpeg;base64,${image.toString('base64')}`, // Ajusta el tipo MIME según tu imagen

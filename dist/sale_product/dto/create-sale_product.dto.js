@@ -28,10 +28,10 @@ __decorate([
     __metadata("design:type", Number)
 ], CreateSaleProductDto.prototype, "products_idproducts", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsInt)(),
     (0, class_validator_1.IsNotEmpty)({ message: "la cantidad no debe ser un vacio" }),
-    (0, swagger_1.ApiProperty)({ example: "10", description: "incersion de una cantidad valida" }),
-    __metadata("design:type", String)
+    (0, swagger_1.ApiProperty)({ example: 10, description: "incersion de una cantidad valida" }),
+    __metadata("design:type", Number)
 ], CreateSaleProductDto.prototype, "quantity", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),

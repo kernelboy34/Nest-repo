@@ -2,10 +2,11 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, Validation
 import { ProductSizeService } from './product_size.service';
 import { CreateProductSizeDto } from './dto/create-product_size.dto';
 import { UpdateProductSizeDto } from './dto/update-product_size.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RolesGuard } from 'src/rol/rols.guard';
 import { Roles } from 'src/rol/decorators/rol.decorator';
 
+@ApiBearerAuth()
 @Controller('product_size')
 @ApiTags('Tamaño de los Productos')
 @UseGuards(RolesGuard)

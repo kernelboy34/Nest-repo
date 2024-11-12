@@ -1,69 +1,81 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSaleProductDto } from './dto/create-sale_product.dto';
 import { UpdateSaleProductDto } from './dto/update-sale_product.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { SaleProduct } from './entities/sale_product.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class SaleProductService {
-  constructor(private db: PrismaService){}
-  async create(data: CreateSaleProductDto) {
-    return await this.db.sale_products.create({
-      data
+  constructor(
+    @Inject("SALE_PRODUCTS_REPOSITORY")
+    private saleproductsRepository: typeof SaleProduct
+  ){}
+  async create(data: CreateSaleProductDto): Promise<SaleProduct>{
+    return await this.saleproductsRepository.create({
+      sales_idsales:data.sales_idsales,
+      products_idproducts: data.products_idproducts,
+      quantity: data.quantity,
+      total_price: data.total_price
     })
   }
 
-  async findAll() {
-    return  await this.db.sale_products.findMany() 
+  async findAll(): Promise<SaleProduct[]>{
+    return await this.saleproductsRepository.findAll({
+      where:{
+        is_deleted:{
+          [Op.ne]:1
+        }
+      }
+    })
   }
 
   async findOne(id: number) {
-    const saleProductFound = await this.db.sale_products.findUnique({
+    const saleproductFound = await this.saleproductsRepository.findOne({
       where:{
-        idsale_products:id
+        idsale_products:{
+          [Op.eq]: id
+        },
+        is_deleted: {
+          [Op.ne]: 1
+        }
       }
     })
-    if(!saleProductFound){
-      throw new NotFoundException("Venta del producto no encontrado")
+    if(!saleproductFound){
+      throw new NotFoundException("Venta de producto no encontrado o fue eliminado")
     }
-    return saleProductFound
+    return saleproductFound
   }
 
   async update(id: number, data: UpdateSaleProductDto) {
-    try{
-      return await this.db.sale_products.update({
-        where:{
-          idsale_products: id,
-          NOT:{
-            is_deleted: 1
-          }
-        },
-        data
-      })
-    }catch(error){
-      if(error instanceof PrismaClientKnownRequestError){
-        if(error.code === 'P2025'){
-          throw new NotFoundException("Venta del producto no encontrado")
+    const [saleproductsUpdate] = await this.saleproductsRepository.update(data,{
+      where:{
+        idsale_products:{
+          [Op.eq]:id
         }
       }
+    })
+    if(saleproductsUpdate === 0){
+      throw new NotFoundException("Venta de productos a actualizar no encontrada")
     }
+    return {message: "Venta de productos actualizado correctamente", status: 200, data}
   }
 
   async remove(id: number) {
-    const saleFound = await this.db.sale_products.update({
-      where:{
-        idsale_products: id,
-        NOT:{
-          is_deleted: 1
+    const [saleproductsDelete] = await this.saleproductsRepository.update(
+      {is_deleted: 1},
+      {
+        where:{
+          idsale_products:{
+            [Op.eq]:id
+          },
+          is_deleted:{
+            [Op.ne]:1
+          }
         }
-      },
-      data:{
-        is_deleted: 1
-      }
-    })
-    if(!saleFound){
-      throw new NotFoundException("Venta del producto no encontrada o fue eliminada")
+      })
+    if(saleproductsDelete === 0){
+      throw new NotFoundException("Venta de productos no encontrado o fue eliminado")
     }
-    return saleFound
+    return { message: "Venta de productos eliminado correctamente", status: 200 }
   }
 }

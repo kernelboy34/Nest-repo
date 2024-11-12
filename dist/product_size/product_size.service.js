@@ -8,82 +8,80 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductSizeService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../prisma/prisma.service");
-const library_1 = require("@prisma/client/runtime/library");
+const sequelize_1 = require("sequelize");
 let ProductSizeService = class ProductSizeService {
-    constructor(db) {
-        this.db = db;
+    constructor(productsizeRepository) {
+        this.productsizeRepository = productsizeRepository;
     }
     async create(data) {
-        try {
-            return this.db.product_sizes.create({
-                data
-            });
-        }
-        catch (error) {
-            console.log(error);
-        }
+        return await this.productsizeRepository.create({
+            products_idproducts: data.products_idproducts,
+            sizes_idsizes: data.sizes_idsizes,
+            amount: data.amount
+        });
     }
     async findAll() {
-        return await this.db.product_sizes.findMany();
-    }
-    async findOne(id) {
-        const productSizeFound = await this.db.product_sizes.findUnique({
+        return await this.productsizeRepository.findAll({
             where: {
-                idproduct_sizes: id
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
+                }
             }
         });
-        if (!productSizeFound) {
-            throw new common_1.NotFoundException("Tamaño no encontrado");
+    }
+    async findOne(id) {
+        const productsizeFound = await this.productsizeRepository.findOne({
+            where: {
+                idproduct_sizes: {
+                    [sequelize_1.Op.eq]: id
+                },
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
+                }
+            }
+        });
+        if (!productsizeFound) {
+            throw new common_1.NotFoundException("Tamaño de producto no encontrado");
         }
-        return productSizeFound;
+        return productsizeFound;
     }
     async update(id, data) {
-        try {
-            return await this.db.product_sizes.update({
-                where: {
-                    idproduct_sizes: id,
-                },
-                data
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code === 'P2025') {
-                    throw new common_1.NotFoundException("Tamaño del producto no encontrado");
+        const [productsizeFound] = await this.productsizeRepository.update(data, {
+            where: {
+                idproduct_sizes: {
+                    [sequelize_1.Op.eq]: id
                 }
             }
+        });
+        if (productsizeFound === 0) {
+            throw new common_1.NotFoundException("Tamaño de productos a actualizar no encontrado");
         }
+        return { message: "Tamaño de productos actaulizado correctamente", status: 200, data };
     }
     async remove(id) {
-        try {
-            return await this.db.product_sizes.update({
-                where: {
-                    idproduct_sizes: id,
-                    NOT: {
-                        is_deleted: 1
-                    }
-                },
-                data: {
-                    is_deleted: 1
-                }
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code === 'P2025') {
-                    throw new common_1.NotFoundException("Tamaño del producto no encontrado o fue eliminado");
+        const [productsizeDelete] = await this.productsizeRepository.update({ is_deleted: 1 }, {
+            where: {
+                idproduct_sizes: {
+                    [sequelize_1.Op.eq]: id
                 }
             }
+        });
+        if (productsizeDelete === 0) {
+            throw new common_1.NotFoundException("Tamaño de productos a eliminar no encontrado");
         }
+        return { message: "Tamaño de productos eliminado correctamente", status: 200 };
     }
 };
 exports.ProductSizeService = ProductSizeService;
 exports.ProductSizeService = ProductSizeService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __param(0, (0, common_1.Inject)("PRODUCTSIZES_REPOSITORY")),
+    __metadata("design:paramtypes", [Object])
 ], ProductSizeService);
 //# sourceMappingURL=product_size.service.js.map

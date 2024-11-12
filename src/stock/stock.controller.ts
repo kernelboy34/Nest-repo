@@ -26,7 +26,7 @@ export class StockController {
 
   @Get('findAll')
   @ApiOperation({summary: "Listar todos los stocks"})
-  @Roles('Administrados', 'Usuario')
+  @Roles('Administrador', 'Usuario')
   findAll() {
     return this.stockService.findAll();
   }

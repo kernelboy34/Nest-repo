@@ -4,39 +4,16 @@ import { UpdateProductSizeDto } from './dto/update-product_size.dto';
 export declare class ProductSizeController {
     private readonly productSizeService;
     constructor(productSizeService: ProductSizeService);
-    create(createProductSizeDto: CreateProductSizeDto): Promise<{
-        is_deleted: number | null;
-        idproduct_sizes: number;
-        products_idproducts: number;
-        sizes_idsizes: number;
-        amount: import("@prisma/client/runtime/library").Decimal | null;
-    }>;
-    findAll(): Promise<{
-        is_deleted: number | null;
-        idproduct_sizes: number;
-        products_idproducts: number;
-        sizes_idsizes: number;
-        amount: import("@prisma/client/runtime/library").Decimal | null;
-    }[]>;
-    findOne(id: string): Promise<{
-        is_deleted: number | null;
-        idproduct_sizes: number;
-        products_idproducts: number;
-        sizes_idsizes: number;
-        amount: import("@prisma/client/runtime/library").Decimal | null;
-    }>;
+    create(createProductSizeDto: CreateProductSizeDto): Promise<import("./entities/product_size.entity").ProductSize>;
+    findAll(): Promise<import("./entities/product_size.entity").ProductSize[]>;
+    findOne(id: string): Promise<import("./entities/product_size.entity").ProductSize>;
     update(id: string, updateProductSizeDto: UpdateProductSizeDto): Promise<{
-        is_deleted: number | null;
-        idproduct_sizes: number;
-        products_idproducts: number;
-        sizes_idsizes: number;
-        amount: import("@prisma/client/runtime/library").Decimal | null;
+        message: string;
+        status: number;
+        data: UpdateProductSizeDto;
     }>;
     remove(id: string): Promise<{
-        is_deleted: number | null;
-        idproduct_sizes: number;
-        products_idproducts: number;
-        sizes_idsizes: number;
-        amount: import("@prisma/client/runtime/library").Decimal | null;
+        message: string;
+        status: number;
     }>;
 }

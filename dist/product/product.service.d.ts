@@ -1,50 +1,20 @@
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma } from '@prisma/client';
+import { Product } from './entities/product.entity';
 export declare class ProductService {
-    private db;
-    constructor(db: PrismaService);
-    create(data: CreateProductDto): Promise<{
-        name: string | null;
-        is_deleted: number | null;
-        idproducts: number;
-        imageUrl: string | null;
-        unitPrice: Prisma.Decimal | null;
-    }>;
-    findAll(): Promise<{
-        name: string | null;
-        is_deleted: number | null;
-        idproducts: number;
-        imageUrl: string | null;
-        unitPrice: Prisma.Decimal | null;
-    }[]>;
-    findOne(id: number): Promise<{
-        name: string | null;
-        is_deleted: number | null;
-        idproducts: number;
-        imageUrl: string | null;
-        unitPrice: Prisma.Decimal | null;
-    }>;
-    paginateProducts(take: number, skip: number): Promise<{
-        name: string | null;
-        is_deleted: number | null;
-        idproducts: number;
-        imageUrl: string | null;
-        unitPrice: Prisma.Decimal | null;
-    }[]>;
+    private productRepository;
+    constructor(productRepository: typeof Product);
+    create(data: CreateProductDto): Promise<Product>;
+    findAll(): Promise<Product[]>;
+    findOne(id: number): Promise<Product>;
+    paginateProducts(take: number, skip: number): Promise<Product[]>;
     update(id: number, data: UpdateProductDto): Promise<{
-        name: string | null;
-        is_deleted: number | null;
-        idproducts: number;
-        imageUrl: string | null;
-        unitPrice: Prisma.Decimal | null;
+        message: string;
+        status: number;
+        data: UpdateProductDto;
     }>;
     remove(id: number): Promise<{
-        name: string | null;
-        is_deleted: number | null;
-        idproducts: number;
-        imageUrl: string | null;
-        unitPrice: Prisma.Decimal | null;
+        message: string;
+        status: number;
     }>;
 }

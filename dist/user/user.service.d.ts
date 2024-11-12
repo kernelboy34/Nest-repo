@@ -1,19 +1,21 @@
-import { user } from "@prisma/client";
-import { PrismaService } from "src/prisma/prisma.service";
 import { CreateUserDto } from "./dto/createUser.dto";
 import { UpdateUserDto } from "./dto/updateUser.dto";
+import { User } from "./entity/user.entity";
 export declare class UserService {
-    private db;
-    constructor(db: PrismaService);
-    create(data: CreateUserDto): Promise<CreateUserDto>;
-    findOne(email: string): Promise<Omit<user, 'password'>>;
-    findAll(): Promise<Omit<user, 'password'>[]>;
-    findUserRole(userId: number): Promise<{
-        name: string;
-        is_deleted: number | null;
-        idrols: number;
+    private userRepository;
+    constructor(userRepository: typeof User);
+    create(data: CreateUserDto): Promise<User>;
+    findOne(email: string): Promise<User>;
+    findAll(): Promise<User[]>;
+    findUserRole(userId: number): Promise<User>;
+    findOneToLogin(email: string): Promise<User>;
+    update(data: UpdateUserDto, id: number): Promise<{
+        message: string;
+        status: number;
+        data: UpdateUserDto;
     }>;
-    findOneToLogin(email: string): Promise<user>;
-    update(data: UpdateUserDto, id: number): Promise<UpdateUserDto>;
-    delete(id: number): Promise<user>;
+    delete(id: number): Promise<{
+        message: string;
+        status: number;
+    }>;
 }

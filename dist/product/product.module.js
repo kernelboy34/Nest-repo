@@ -10,14 +10,20 @@ exports.ProductModule = void 0;
 const common_1 = require("@nestjs/common");
 const product_service_1 = require("./product.service");
 const product_controller_1 = require("./product.controller");
-const prisma_service_1 = require("../prisma/prisma.service");
+const product_provide_1 = require("./provide/product.provide");
+const sequelize_1 = require("@nestjs/sequelize");
+const product_entity_1 = require("./entities/product.entity");
+const sequelize_provider_1 = require("../sequelize/sequelize.provider");
+const rols_module_1 = require("../rol/rols.module");
 let ProductModule = class ProductModule {
 };
 exports.ProductModule = ProductModule;
 exports.ProductModule = ProductModule = __decorate([
     (0, common_1.Module)({
         controllers: [product_controller_1.ProductController],
-        providers: [product_service_1.ProductService, prisma_service_1.PrismaService],
+        providers: [product_service_1.ProductService, ...product_provide_1.productProvider],
+        exports: [product_service_1.ProductService],
+        imports: [sequelize_1.SequelizeModule.forFeature([product_entity_1.Product]), sequelize_provider_1.SequelizeProvider, rols_module_1.RolsModule]
     })
 ], ProductModule);
 //# sourceMappingURL=product.module.js.map

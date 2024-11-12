@@ -10,14 +10,19 @@ exports.SaleProductModule = void 0;
 const common_1 = require("@nestjs/common");
 const sale_product_service_1 = require("./sale_product.service");
 const sale_product_controller_1 = require("./sale_product.controller");
-const prisma_service_1 = require("../prisma/prisma.service");
+const sequelize_1 = require("@nestjs/sequelize");
+const sale_product_entity_1 = require("./entities/sale_product.entity");
+const sequelize_provider_1 = require("../sequelize/sequelize.provider");
+const rols_module_1 = require("../rol/rols.module");
+const sale_product_provide_1 = require("./provide/sale_product.provide");
 let SaleProductModule = class SaleProductModule {
 };
 exports.SaleProductModule = SaleProductModule;
 exports.SaleProductModule = SaleProductModule = __decorate([
     (0, common_1.Module)({
         controllers: [sale_product_controller_1.SaleProductController],
-        providers: [sale_product_service_1.SaleProductService, prisma_service_1.PrismaService],
+        providers: [sale_product_service_1.SaleProductService, ...sale_product_provide_1.saleproductProvider],
+        imports: [sequelize_1.SequelizeModule.forFeature([sale_product_entity_1.SaleProduct]), sequelize_provider_1.SequelizeProvider, rols_module_1.RolsModule]
     })
 ], SaleProductModule);
 //# sourceMappingURL=sale_product.module.js.map

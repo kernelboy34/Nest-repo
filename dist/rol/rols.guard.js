@@ -8,18 +8,21 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RolesGuard = void 0;
 const common_1 = require("@nestjs/common");
 const core_1 = require("@nestjs/core");
 const auth_guard_1 = require("../auth/auth.guard");
 const rol_decorator_1 = require("./decorators/rol.decorator");
-const prisma_service_1 = require("../prisma/prisma.service");
+const sequelize_1 = require("sequelize");
 let RolesGuard = class RolesGuard extends auth_guard_1.JwtAuthGuard {
-    constructor(reflector, db) {
+    constructor(reflector, rolRepository) {
         super();
         this.reflector = reflector;
-        this.db = db;
+        this.rolRepository = rolRepository;
     }
     async canActivate(context) {
         const isAuthenticated = await super.canActivate(context);
@@ -34,11 +37,14 @@ let RolesGuard = class RolesGuard extends auth_guard_1.JwtAuthGuard {
         }
         const request = context.switchToHttp().getRequest();
         const user = request.user;
-        console.log(user);
-        console.log(user.rol);
-        const userRole = await this.db.rols.findFirst({
+        console.log("data:", user);
+        console.log("Usuario:", user);
+        console.log("Rols:", user.rol);
+        const userRole = await this.rolRepository.findOne({
             where: {
-                name: user.rol
+                name: {
+                    [sequelize_1.Op.eq]: user.rol
+                }
             }
         });
         console.log("User Role:", userRole?.name);
@@ -52,7 +58,7 @@ let RolesGuard = class RolesGuard extends auth_guard_1.JwtAuthGuard {
 exports.RolesGuard = RolesGuard;
 exports.RolesGuard = RolesGuard = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [core_1.Reflector,
-        prisma_service_1.PrismaService])
+    __param(1, (0, common_1.Inject)("ROLS_REPOSITORY")),
+    __metadata("design:paramtypes", [core_1.Reflector, Object])
 ], RolesGuard);
 //# sourceMappingURL=rols.guard.js.map

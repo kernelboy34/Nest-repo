@@ -8,79 +8,83 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StockService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../prisma/prisma.service");
-const library_1 = require("@prisma/client/runtime/library");
+const sequelize_1 = require("sequelize");
 let StockService = class StockService {
-    constructor(db) {
-        this.db = db;
+    constructor(stockRepository) {
+        this.stockRepository = stockRepository;
     }
     async create(data) {
-        try {
-            return this.db.stocks.create({
-                data
-            });
-        }
-        catch (error) {
-            console.log(error);
-        }
+        return await this.stockRepository.create({
+            branches_idbranches: data.branches_idbranches,
+            products_idproducts: data.products_idproducts,
+            quantity: data.quantity
+        });
     }
     async findAll() {
-        return await this.db.stocks.findMany();
+        return await this.stockRepository.findAll({
+            where: {
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
+                }
+            }
+        });
     }
     async findOne(id) {
-        const stockFound = await this.db.products.findUnique({
+        const stockFound = await this.stockRepository.findOne({
             where: {
-                idproducts: id
+                idstocks: {
+                    [sequelize_1.Op.eq]: id
+                },
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
+                }
             }
         });
         if (!stockFound) {
-            throw new common_1.NotFoundException("Cantidad no encontrada");
+            throw new common_1.NotFoundException("Existencia no encontrada");
         }
         return stockFound;
     }
     async update(id, data) {
-        try {
-            return await this.db.stocks.update({
-                where: {
-                    idstocks: id,
-                },
-                data
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code == 'P2025') {
-                    throw new common_1.NotFoundException("Cantidad a actualizar no encontrada");
+        const [stockUpdate] = await this.stockRepository.update(data, {
+            where: {
+                idstocks: {
+                    [sequelize_1.Op.eq]: id
                 }
             }
+        });
+        if (stockUpdate === 0) {
+            throw new common_1.NotFoundException("Existencia no encontrada o fue eliminada");
         }
+        return { message: "Existencia actualizado correctamente", status: 200, data: data };
     }
     async remove(id) {
-        try {
-            return await this.db.stocks.update({
-                where: {
-                    idstocks: id
+        const [stockDelete] = await this.stockRepository.update({ is_deleted: 1 }, {
+            where: {
+                idstocks: {
+                    [sequelize_1.Op.eq]: id
                 },
-                data: {
-                    is_deleted: 1
-                }
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code == 'P2025') {
-                    throw new common_1.NotFoundException("Cantidad no encontrada o fue eliminada");
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
                 }
             }
+        });
+        if (stockDelete === 0) {
+            throw new common_1.NotFoundException("Existencia a eliminar no encontrada");
         }
+        return { message: "Existencia eliminado correctamente", status: 200 };
     }
 };
 exports.StockService = StockService;
 exports.StockService = StockService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __param(0, (0, common_1.Inject)("STOCKS_REPOSITORY")),
+    __metadata("design:paramtypes", [Object])
 ], StockService);
 //# sourceMappingURL=stock.service.js.map

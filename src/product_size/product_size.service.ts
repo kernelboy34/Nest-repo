@@ -1,74 +1,79 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductSizeDto } from './dto/create-product_size.dto';
 import { UpdateProductSizeDto } from './dto/update-product_size.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { ProductSize } from './entities/product_size.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class ProductSizeService {
-  constructor(private db: PrismaService){}
-  async create(data: CreateProductSizeDto) {
-    try{
-      return this.db.product_sizes.create({
-        data
-      })
-    }catch(error){
-      console.log(error)
-    }
+  constructor(
+    @Inject("PRODUCTSIZES_REPOSITORY")
+    private productsizeRepository: typeof ProductSize
+  ){}
+  async create(data: CreateProductSizeDto): Promise<ProductSize>{
+    return await this.productsizeRepository.create({
+      products_idproducts: data.products_idproducts,
+      sizes_idsizes: data.sizes_idsizes,
+      amount: data.amount
+    })
   }
 
-  async findAll() {
-    return await this.db.product_sizes.findMany() 
+  async findAll(): Promise<ProductSize[]>{
+    return await this.productsizeRepository.findAll({
+      where:{
+        is_deleted:{
+          [Op.ne]: 1
+        }
+      }
+    })
   }
 
   async findOne(id: number) {
-    const productSizeFound = await this.db.product_sizes.findUnique({
+    const productsizeFound = await this.productsizeRepository.findOne({
       where:{
-        idproduct_sizes:id
+        idproduct_sizes:{
+          [Op.eq]: id
+        },
+        is_deleted:{
+          [Op.ne]: 1 
+        }
       }
     })
-    if(!productSizeFound){
-      throw new NotFoundException("Tamaño no encontrado")
+    if(!productsizeFound){
+      throw new NotFoundException("Tamaño de producto no encontrado")
     }
-    return productSizeFound
+    return productsizeFound
   }
 
   async update(id: number, data: UpdateProductSizeDto) {
-    try{
-      return await this.db.product_sizes.update({
-        where:{
-          idproduct_sizes: id,
-        },
-        data
-      })
-    }catch(error){
-      if(error instanceof PrismaClientKnownRequestError){
-        if(error.code === 'P2025'){
-          throw new NotFoundException("Tamaño del producto no encontrado")
+    const [productsizeFound] = await this.productsizeRepository.update(data, {
+      where:{
+        idproduct_sizes:{
+          [Op.eq]: id
         }
       }
+    })
+    if(productsizeFound === 0){
+      throw new NotFoundException("Tamaño de productos a actualizar no encontrado")
     }
+    return {message: "Tamaño de productos actaulizado correctamente", status: 200, data}
   }
 
   async remove(id: number) {
-    try{
-      return await this.db.product_sizes.update({
+    const [productsizeDelete] = await this.productsizeRepository.update(
+      { is_deleted: 1},
+      {
         where:{
-          idproduct_sizes: id,
-          NOT:{
-            is_deleted: 1
+          idproduct_sizes:{
+            [Op.eq]: id
           }
-        },
-        data:{
-          is_deleted: 1
-        }
-      })
-    }catch(error){
-      if(error instanceof PrismaClientKnownRequestError){
-        if(error.code === 'P2025'){
-          throw new NotFoundException("Tamaño del producto no encontrado o fue eliminado")
         }
       }
+    )
+    if(productsizeDelete === 0){ 
+      throw new NotFoundException("Tamaño de productos a eliminar no encontrado")
     }
+
+    return {message: "Tamaño de productos eliminado correctamente", status: 200}
   }
 }

@@ -99,6 +99,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ProductSizeController.prototype, "remove", null);
 exports.ProductSizeController = ProductSizeController = __decorate([
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Controller)('product_size'),
     (0, swagger_1.ApiTags)('Tamaño de los Productos'),
     (0, common_1.UseGuards)(rols_guard_1.RolesGuard),

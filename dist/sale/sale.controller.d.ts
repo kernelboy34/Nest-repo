@@ -4,39 +4,16 @@ import { UpdateSaleDto } from './dto/update-sale.dto';
 export declare class SaleController {
     private readonly saleService;
     constructor(saleService: SaleService);
-    create(createSaleDto: CreateSaleDto): Promise<{
-        is_deleted: number | null;
-        user_iduser: number;
-        idsales: number;
-        date_sale: Date;
-        status: number | null;
-    }>;
-    findAll(): Promise<{
-        is_deleted: number | null;
-        user_iduser: number;
-        idsales: number;
-        date_sale: Date;
-        status: number | null;
-    }[]>;
-    findOne(id: string): Promise<{
-        is_deleted: number | null;
-        user_iduser: number;
-        idsales: number;
-        date_sale: Date;
-        status: number | null;
-    }>;
+    create(createSaleDto: CreateSaleDto): Promise<import("./entities/sale.entity").Sale>;
+    findAll(): Promise<import("./entities/sale.entity").Sale[]>;
+    findOne(id: string): Promise<import("./entities/sale.entity").Sale>;
     update(id: string, updateSaleDto: UpdateSaleDto): Promise<{
-        is_deleted: number | null;
-        user_iduser: number;
-        idsales: number;
-        date_sale: Date;
-        status: number | null;
+        message: string;
+        status: number;
+        data: UpdateSaleDto;
     }>;
     remove(id: string): Promise<{
-        is_deleted: number | null;
-        user_iduser: number;
-        idsales: number;
-        date_sale: Date;
-        status: number | null;
+        message: string;
+        status: number;
     }>;
 }

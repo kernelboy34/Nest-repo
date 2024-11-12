@@ -8,80 +8,83 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PersonalDataService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../prisma/prisma.service");
-const library_1 = require("@prisma/client/runtime/library");
+const sequelize_1 = require("sequelize");
 let PersonalDataService = class PersonalDataService {
-    constructor(db) {
-        this.db = db;
+    constructor(personaldataRepository) {
+        this.personaldataRepository = personaldataRepository;
     }
     async create(data) {
-        return await this.db.personal_data.create({
-            data
+        return await this.personaldataRepository.create({
+            user_iduser: data.user_iduser,
+            name: data.name,
+            lastname: data.lastname,
+            bank_account: data.bank_account,
+            phone: data.phone,
+            address: data.address
         });
     }
     async findAll() {
-        return await this.db.personal_data.findMany();
-    }
-    async findOne(id) {
-        const data_found = await this.db.personal_data.findFirst({
+        return await this.personaldataRepository.findAll({
             where: {
-                idpersonal_data: id
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
+                }
             }
         });
-        if (!data_found) {
+    }
+    async findOne(id) {
+        const personaldataFound = await this.personaldataRepository.findOne({
+            where: {
+                idpersonal_data: {
+                    [sequelize_1.Op.eq]: id
+                }
+            }
+        });
+        if (!personaldataFound) {
             throw new common_1.NotFoundException("Datos personales no encontrado");
         }
-        return data_found;
+        return personaldataFound;
     }
     async update(id, data) {
-        try {
-            return await this.db.personal_data.update({
-                where: {
-                    idpersonal_data: id,
-                    NOT: {
-                        is_deleted: 1
-                    }
-                },
-                data
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code == 'P2025') {
-                    throw new common_1.NotFoundException("Datos personales no encontrado");
+        const [personaldataUpdate] = await this.personaldataRepository.update(data, {
+            where: {
+                idpersonal_data: {
+                    [sequelize_1.Op.eq]: id
                 }
             }
+        });
+        if (personaldataUpdate === 0) {
+            throw new common_1.NotFoundException("Datos personales a actualizar no encontrado");
         }
+        return { message: "Datos personales actualizado correctamente", status: 200, data };
     }
     async remove(id) {
-        try {
-            return await this.db.personal_data.update({
-                where: {
-                    idpersonal_data: id,
-                    NOT: {
-                        is_deleted: 1
-                    }
+        const [personaldataDelete] = await this.personaldataRepository.update({ is_deleted: 1 }, {
+            where: {
+                idpersonal_data: {
+                    [sequelize_1.Op.eq]: id
                 },
-                data: {
-                    is_deleted: 1
-                }
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code == 'P2025') {
-                    throw new common_1.NotFoundException("Datos personales no encontrado o fue eliminado");
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
                 }
             }
+        });
+        if (personaldataDelete === 0) {
+            throw new common_1.NotFoundException("Datos personales a eliminar no encontrado");
         }
+        return { message: "Datos personales eliminado correctamente", status: 200 };
     }
 };
 exports.PersonalDataService = PersonalDataService;
 exports.PersonalDataService = PersonalDataService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __param(0, (0, common_1.Inject)("PERSONAL_DATAS_REPOSITORY")),
+    __metadata("design:paramtypes", [Object])
 ], PersonalDataService);
 //# sourceMappingURL=personal_data.service.js.map

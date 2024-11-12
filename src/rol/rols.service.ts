@@ -1,73 +1,83 @@
-import { ConflictException, Injectable, NotFoundException} from "@nestjs/common";
-import { PrismaService } from "src/prisma/prisma.service";
-import { CreateRolsDto } from "./dto/rols.dto";
-import { rols } from "@prisma/client";
+import { ConflictException, Inject, Injectable, NotFoundException} from "@nestjs/common";
+import { CreateRolsDto } from "./dto/rols.dto";;
 import { UpdateRolsDto } from "./dto/rolsupdate.dto";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { Rol } from "./entity/rol.entity";
+import { Op, where } from "sequelize";
 
 @Injectable()
 export class RolsService{
-    constructor(private db: PrismaService){}
+    constructor(
+        @Inject("ROLS_REPOSITORY")
+        private rolRepository: typeof Rol
+    ){}
 
-    async create(data: CreateRolsDto): Promise<CreateRolsDto>{
-        return await this.db.rols.create({
-            data
+    async create(data: CreateRolsDto): Promise<Rol>{
+        return await this.rolRepository.create({
+            name: data.name,
+            is_deleted: data.is_deleted
         })
     }
 
-    async findOne(id: number): Promise<rols>{
-        const rolsFound = await this.db.rols.findUnique({
+    async findOne(id: number){
+        const userFound = await this.rolRepository.findOne({
             where:{
-                idrols: id
-            }
-        })
-        if(!rolsFound){
-            throw new NotFoundException("Rol no encontrado")
-        }
-        return rolsFound
-    }
-
-    async findAll(): Promise<rols[]>{
-        return await this.db.rols.findMany()
-    }
-
-    async updateOne(data : UpdateRolsDto, id: number): Promise<UpdateRolsDto>{
-        try{
-            return await this.db.rols.update({
-                where: {
-                    idrols: id,
-                },
-                data
-            })
-        }catch(error){
-            if(error instanceof PrismaClientKnownRequestError){
-                if(error.code == 'P2025'){
-                    throw new NotFoundException("Rol no encontrado")
+                idroles:{
+                    [Op.eq]: id
                 }
             }
+        })
+        if(!userFound){
+            throw new NotFoundException("Usuario no encontrado")
         }
+
+        return userFound
+    }
+
+    async findAll(): Promise<Rol[]>{
+        return this.rolRepository.findAll({
+            where:{
+                is_deleted:{
+                    [Op.ne]:1
+                }
+            }
+        })
+    }
+
+    async updateOne(data : UpdateRolsDto, id: number){
+        const [userUpdated] =  await this.rolRepository.update(
+            data,
+            {
+                where:{
+                    idroles:{
+                        [Op.eq]:id
+                    },
+                }
+            }
+        )
+        if(userUpdated === 0){
+            throw new NotFoundException("Rol a actualizar no encontrado")
+        }
+        return {message: "Rol actualizado correctamente", status: 200, data}
     }
 
     async deleteOne(id: number){
-        try{
-            return await this.db.rols.update({
+        const [userDeleted] = await this.rolRepository.update(
+            {is_deleted: 1},
+            {
                 where:{
-                    idrols: id,
-                    NOT:{
-                        is_deleted: 1
+                    idroles:{
+                        [Op.eq]:id
+                    },
+                    is_deleted:{
+                        [Op.ne]:1
                     }
-                },
-                data:{
-                    is_deleted: 1
-                }
-            })
-        }catch(error){
-            console.log(error)
-            if(error instanceof PrismaClientKnownRequestError){
-                if(error.code == 'P2025'){
-                    throw new NotFoundException("Rol no encontrado o fue eliminado")
                 }
             }
+        )
+        if(userDeleted === 0){
+            throw new NotFoundException("Rol a eliminar no encontrado")
         }
+
+        return { message: "Rol eliminado correctamente", status: 200 }
     }
 }

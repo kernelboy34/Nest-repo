@@ -1,74 +1,86 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePersonalDatumDto } from './dto/create-personal_datum.dto';
 import { UpdatePersonalDatumDto } from './dto/update-personal_datum.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { PersonalDatum } from './entities/personal_datum.entity';
+import { Op } from 'sequelize';
+
 
 @Injectable()
 export class PersonalDataService {
-  constructor(private db: PrismaService){}
-  async create(data: CreatePersonalDatumDto) {
-    return await this.db.personal_data.create({
-      data
+  constructor(
+    @Inject("PERSONAL_DATAS_REPOSITORY")
+    private personaldataRepository: typeof PersonalDatum
+  ){}
+  async create(data: CreatePersonalDatumDto): Promise<PersonalDatum>{
+    return await this.personaldataRepository.create({
+      user_iduser: data.user_iduser,
+      name: data.name,
+      lastname: data.lastname,
+      bank_account: data.bank_account,
+      phone: data.phone,
+      address: data.address
     })
   }
 
-  async findAll() {
-    return await this.db.personal_data.findMany()
+  async findAll(): Promise<PersonalDatum[]>{
+    return await this.personaldataRepository.findAll({
+      where:{
+        is_deleted:{
+          [Op.ne]:1
+        }
+      }
+    })
   }
 
   async findOne(id: number) {
-    const data_found = await this.db.personal_data.findFirst({
+    const personaldataFound = await this.personaldataRepository.findOne({
       where:{
-        idpersonal_data: id
+        idpersonal_data:{
+          [Op.eq]:id
+        }
       }
     })
-    if(!data_found){
+
+    if(!personaldataFound){
       throw new NotFoundException("Datos personales no encontrado")
     }
 
-    return data_found
+    return personaldataFound
   }
 
   async update(id: number, data: UpdatePersonalDatumDto) {
-    try{
-      return await this.db.personal_data.update({
-        where:{
-          idpersonal_data: id,
-          NOT:{
-            is_deleted: 1
-          }
-        },
-        data
-      })
-    }catch(error){
-      if(error instanceof PrismaClientKnownRequestError){
-        if(error.code == 'P2025'){
-          throw new NotFoundException("Datos personales no encontrado")
+    const [personaldataUpdate] = await this.personaldataRepository.update(data,{
+      where:{
+        idpersonal_data:{
+          [Op.eq]:id
         }
       }
+    })
+
+    if(personaldataUpdate === 0){
+      throw new NotFoundException("Datos personales a actualizar no encontrado")
     }
+    return {message: "Datos personales actualizado correctamente", status: 200, data}
   }
 
   async remove(id: number) {
-    try{
-      return await this.db.personal_data.update({
+    const [personaldataDelete] = await this.personaldataRepository.update(
+      { is_deleted: 1 },
+      {
         where:{
-          idpersonal_data: id,
-          NOT:{
-            is_deleted: 1
+          idpersonal_data:{
+            [Op.eq]: id 
+          },
+          is_deleted:{
+            [Op.ne]: 1
           }
-        },
-        data:{
-          is_deleted: 1
-        }
-      })
-    }catch(error){
-      if(error instanceof PrismaClientKnownRequestError){
-        if(error.code == 'P2025'){
-          throw new NotFoundException("Datos personales no encontrado o fue eliminado")
         }
       }
+    )
+    if(personaldataDelete === 0){
+      throw new NotFoundException("Datos personales a eliminar no encontrado")
     }
+
+    return {message: "Datos personales eliminado correctamente", status: 200}
   }
 }

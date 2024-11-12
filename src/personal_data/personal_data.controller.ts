@@ -19,14 +19,14 @@ export class PersonalDataController {
   }))
   @Post('create')
   @ApiOperation({summary:"Crear un nuevo dato personal"})
-  @Roles('Administrador')
+  @Roles('Administrador', 'Usuario')
   create(@Body() data: CreatePersonalDatumDto) {
     return this.personalDataService.create(data);
   }
 
   @Get('findAll')
   @ApiOperation({summary: "Listar todos los datos personal"})
-  @Roles('Administrador', 'Usuario')
+  @Roles('Administrador')
   findAll() {
     return this.personalDataService.findAll();
   }
@@ -44,7 +44,7 @@ export class PersonalDataController {
   }))
   @Patch('updateOne/:id')
   @ApiOperation({summary: "Actualizar un dato personal segun el id"})
-  @Roles('Usuario')
+  @Roles('Usuario', 'Administrador')
   update(@Param('id') id: string, @Body() updatePersonalDatumDto: UpdatePersonalDatumDto) {
     return this.personalDataService.update(+id, updatePersonalDatumDto);
   }

@@ -1,82 +1,82 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSizeDto } from './dto/create-size.dto';
 import { UpdateSizeDto } from './dto/update-size.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { Size } from './entities/size.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class SizeService {
-  constructor(private db: PrismaService){}
+  constructor(
+    @Inject("SIZES_REPOSITORY")
+    private sizeRepository: typeof Size
+  ){}
 
-  async create(data: CreateSizeDto) {
-    try{
-      return await this.db.sizes.create({
-        data
-      })
-    }catch(error){
-      console.log(error)
-    }
+  async create(data: CreateSizeDto): Promise<Size>{
+    return await this.sizeRepository.create({
+      name: data.name
+    })
   }
 
-  async findAll() {
-    return await this.db.sizes.findMany()
-  }
-
-  async findOne(id: number) {
-    try{
-      return await this.db.sizes.findFirst({
-        where:{
-          idsizes: id
-        },
-        include:{
-          product_sizes: true
-        }
-      });
-    }catch(error){
-      if(error instanceof PrismaClientKnownRequestError){
-        if(error.code == 'P2025'){
-          throw new NotFoundException("Tamaño no encontrado o fue eliminado")
+  async findAll():Promise<Size[]>{
+    return await this.sizeRepository.findAll({
+      where:{
+        is_deleted:{
+          [Op.ne]: 1
         }
       }
-    }
+    })
+  }
+
+  async findOne(id: number):Promise<Size>{
+      const sizeFound =  await this.sizeRepository.findOne({
+        where:{
+          idsizes:{
+            [Op.eq]: id
+          },
+          is_deleted:{
+            [Op.ne]: 1
+          }
+        }
+      })
+      if(!sizeFound){
+        throw new NotFoundException("Tamaño no encontrado o fue eliminado")
+      }
+
+      return sizeFound
   }
 
   async update(id: number, data: UpdateSizeDto) {
-    try{
-      return await this.db.sizes.update({
-        where:{
-          idsizes: id,
-        },
-        data
-      })
-    }catch(error){
-      if(error instanceof PrismaClientKnownRequestError){
-        if(error.code === 'P2025'){
-          throw new NotFoundException("Tamaño no encontrado")
+    const [sizeUpdate] = await this.sizeRepository.update(data,{
+      where:{
+        idsizes:{
+          [Op.eq]: id
         }
       }
+    })
+    if(sizeUpdate === 0){
+      throw new NotFoundException("Tamaño no encontrado o fue eliminado")
     }
+
+    return {message: "Tamaño actualizado correctamente", status: 200, data: data}
   }
 
   async delete(id: number) {
-    try{
-      return await this.db.sizes.update({
+    const [sizeDeleted] = await this.sizeRepository.update(
+      {is_deleted: 1},
+      {
         where:{
-          idsizes: id,
-          NOT:{
-            is_deleted:1
+          idsizes:{
+            [Op.eq]: id
+          },
+          is_deleted:{
+            [Op.ne]: 1
           }
-        },
-        data:{
-          is_deleted: 1
-        }
-      })
-    }catch(error){
-      if(error instanceof PrismaClientKnownRequestError){
-        if(error.code == 'P2025'){
-          throw new NotFoundException("Tamaño no encontrado o fue eliminado")
         }
       }
+    )
+    if(sizeDeleted === 0){
+      throw new NotFoundException("No se puede eliminar el tamaño porque no fue encontrado o fue eliminado")
     }
+    return {message: "Tamaño eliminado correctamente", status: 200}
   }
 }

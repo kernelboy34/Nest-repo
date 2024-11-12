@@ -8,78 +8,80 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RolsService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../prisma/prisma.service");
-const library_1 = require("@prisma/client/runtime/library");
+;
+const sequelize_1 = require("sequelize");
 let RolsService = class RolsService {
-    constructor(db) {
-        this.db = db;
+    constructor(rolRepository) {
+        this.rolRepository = rolRepository;
     }
     async create(data) {
-        return await this.db.rols.create({
-            data
+        return await this.rolRepository.create({
+            name: data.name,
+            is_deleted: data.is_deleted
         });
     }
     async findOne(id) {
-        const rolsFound = await this.db.rols.findUnique({
+        const userFound = await this.rolRepository.findOne({
             where: {
-                idrols: id
+                idroles: {
+                    [sequelize_1.Op.eq]: id
+                }
             }
         });
-        if (!rolsFound) {
-            throw new common_1.NotFoundException("Rol no encontrado");
+        if (!userFound) {
+            throw new common_1.NotFoundException("Usuario no encontrado");
         }
-        return rolsFound;
+        return userFound;
     }
     async findAll() {
-        return await this.db.rols.findMany();
+        return this.rolRepository.findAll({
+            where: {
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
+                }
+            }
+        });
     }
     async updateOne(data, id) {
-        try {
-            return await this.db.rols.update({
-                where: {
-                    idrols: id,
+        const [userUpdated] = await this.rolRepository.update(data, {
+            where: {
+                idroles: {
+                    [sequelize_1.Op.eq]: id
                 },
-                data
-            });
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code == 'P2025') {
-                    throw new common_1.NotFoundException("Rol no encontrado");
-                }
             }
+        });
+        if (userUpdated === 0) {
+            throw new common_1.NotFoundException("Rol a actualizar no encontrado");
         }
+        return { message: "Rol actualizado correctamente", status: 200, data };
     }
     async deleteOne(id) {
-        try {
-            return await this.db.rols.update({
-                where: {
-                    idrols: id,
-                    NOT: {
-                        is_deleted: 1
-                    }
+        const [userDeleted] = await this.rolRepository.update({ is_deleted: 1 }, {
+            where: {
+                idroles: {
+                    [sequelize_1.Op.eq]: id
                 },
-                data: {
-                    is_deleted: 1
-                }
-            });
-        }
-        catch (error) {
-            console.log(error);
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code == 'P2025') {
-                    throw new common_1.NotFoundException("Rol no encontrado o fue eliminado");
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
                 }
             }
+        });
+        if (userDeleted === 0) {
+            throw new common_1.NotFoundException("Rol a eliminar no encontrado");
         }
+        return { message: "Rol eliminado correctamente", status: 200 };
     }
 };
 exports.RolsService = RolsService;
 exports.RolsService = RolsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __param(0, (0, common_1.Inject)("ROLS_REPOSITORY")),
+    __metadata("design:paramtypes", [Object])
 ], RolsService);
 //# sourceMappingURL=rols.service.js.map

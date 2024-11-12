@@ -1,14 +1,16 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from "@nestjs/common";
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException, Inject } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { JwtAuthGuard } from "src/auth/auth.guard";
 import { ROLES_KEY } from "./decorators/rol.decorator";
-import { PrismaService } from "src/prisma/prisma.service";
+import { Rol } from "./entity/rol.entity";
+import { Op } from "sequelize";
 
 @Injectable()
 export class RolesGuard extends JwtAuthGuard implements CanActivate{
     constructor(
         private reflector: Reflector,
-        private db: PrismaService
+        @Inject("ROLS_REPOSITORY")
+        private rolRepository: typeof Rol
     ){
         super()
     }
@@ -28,13 +30,16 @@ export class RolesGuard extends JwtAuthGuard implements CanActivate{
 
         const request = context.switchToHttp().getRequest()
         const user = request.user
-        console.log(user)
-        console.log(user.rol)
+        console.log("data:",user)
+        console.log("Usuario:",user)
+        console.log("Rols:",user.rol)
 
 
-        const userRole = await this.db.rols.findFirst({
+        const userRole = await this.rolRepository.findOne({
             where:{
-                name: user.rol
+                name: {
+                    [Op.eq]:user.rol
+                }
             }
         })
         console.log("User Role:", userRole?.name);

@@ -57,7 +57,7 @@ __decorate([
 __decorate([
     (0, common_1.Get)('findAll'),
     (0, swagger_1.ApiOperation)({ summary: "Listar todos los departamentos" }),
-    (0, rol_decorator_1.Roles)('Administador', 'Usuario'),
+    (0, rol_decorator_1.Roles)('Administrador', 'Usuario'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
