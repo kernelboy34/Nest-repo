@@ -65,7 +65,6 @@ let ProductService = class ProductService {
         });
     }
     async update(id, data, file) {
-        console.log(file);
         const existingProduct = await this.productRepository.findByPk(id);
         if (!existingProduct) {
             throw new common_1.NotFoundException("Producto no encontrado");
