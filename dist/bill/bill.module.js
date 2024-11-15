@@ -15,14 +15,16 @@ const rols_module_1 = require("../rol/rols.module");
 const sequelize_provider_1 = require("../sequelize/sequelize.provider");
 const bill_entity_1 = require("./entities/bill.entity");
 const bill_provide_1 = require("./provider/bill.provide");
+const sale_module_1 = require("../sale/sale.module");
+const sale_provide_1 = require("../sale/provide/sale.provide");
 let BillModule = class BillModule {
 };
 exports.BillModule = BillModule;
 exports.BillModule = BillModule = __decorate([
     (0, common_1.Module)({
         controllers: [bill_controller_1.BillController],
-        providers: [bill_service_1.BillService, ...bill_provide_1.billProvider],
-        imports: [rols_module_1.RolsModule, sequelize_1.SequelizeModule.forFeature([bill_entity_1.Bill]), sequelize_provider_1.SequelizeProvider]
+        providers: [bill_service_1.BillService, ...bill_provide_1.billProvider, ...sale_provide_1.saleProvider],
+        imports: [rols_module_1.RolsModule, sequelize_1.SequelizeModule.forFeature([bill_entity_1.Bill]), sequelize_provider_1.SequelizeProvider, sale_module_1.SaleModule]
     })
 ], BillModule);
 //# sourceMappingURL=bill.module.js.map

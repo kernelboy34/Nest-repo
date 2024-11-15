@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { Exclude } from 'class-transformer'
-import { IsInt, IsNotEmpty, IsNumber, IsOptional } from 'class-validator'
+import { IsInt, IsNotEmpty, IsNumber, IsOptional, Validate } from 'class-validator'
 export class CreateStockDto {
     @IsNotEmpty({message: "La id del departamento no debe estar vacio"})
     @IsInt({message:"La sucursal debe ser un entero"})

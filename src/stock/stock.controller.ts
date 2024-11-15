@@ -37,7 +37,7 @@ export class StockController {
   @Get('findOne/:id')
   @ApiOperation({summary: "Listar un stock por id"})
   @Roles('Usuario', 'Administrador')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.stockService.findOne(+id);
   }
 
@@ -48,7 +48,7 @@ export class StockController {
   @Patch('updateOne/:id')
   @ApiOperation({summary: "Actualizar un stock por el id"})
   @Roles('Administrador')
-  update(@Param('id') id: string, @Body() updateStockDto: UpdateStockDto) {
+  update(@Param('id') id: number, @Body() updateStockDto: UpdateStockDto) {
     return this.stockService.update(+id, updateStockDto);
   }
   
@@ -59,7 +59,7 @@ export class StockController {
   @Delete('deleteOne/:id')
   @ApiOperation({summary: "Eliminar un stock por el id"})
   @Roles('Administrador')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.stockService.remove(+id);
   }
 }

@@ -30,10 +30,6 @@ export class RolesGuard extends JwtAuthGuard implements CanActivate{
 
         const request = context.switchToHttp().getRequest()
         const user = request.user
-        console.log("data:",user)
-        console.log("Usuario:",user)
-        console.log("Rols:",user.rol)
-
 
         const userRole = await this.rolRepository.findOne({
             where:{

@@ -14,14 +14,18 @@ const product_size_provider_1 = require("./provider/product_size.provider");
 const sequelize_1 = require("@nestjs/sequelize");
 const product_size_entity_1 = require("./entities/product_size.entity");
 const rols_module_1 = require("../rol/rols.module");
+const product_provide_1 = require("../product/provide/product.provide");
+const size_provider_1 = require("../size/provider/size.provider");
+const product_module_1 = require("../product/product.module");
+const size_module_1 = require("../size/size.module");
 let ProductSizeModule = class ProductSizeModule {
 };
 exports.ProductSizeModule = ProductSizeModule;
 exports.ProductSizeModule = ProductSizeModule = __decorate([
     (0, common_1.Module)({
         controllers: [product_size_controller_1.ProductSizeController],
-        providers: [product_size_service_1.ProductSizeService, ...product_size_provider_1.productsizeProvider],
-        imports: [sequelize_1.SequelizeModule.forFeature([product_size_entity_1.ProductSize]), sequelize_1.SequelizeModule, rols_module_1.RolsModule]
+        providers: [product_size_service_1.ProductSizeService, ...product_size_provider_1.productsizeProvider, ...product_provide_1.productProvider, ...size_provider_1.sizeProvider],
+        imports: [sequelize_1.SequelizeModule.forFeature([product_size_entity_1.ProductSize]), sequelize_1.SequelizeModule, rols_module_1.RolsModule, product_module_1.ProductModule, size_module_1.SizesModule]
     })
 ], ProductSizeModule);
 //# sourceMappingURL=product_size.module.js.map

@@ -26,7 +26,6 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException("Autorizacion denegada, revise las credenciales");
         }
         const userRole = await this.userService.findUserRole(user.iduser);
-        console.log(userRole.role.name);
         if (!userRole) {
             throw new common_1.UnauthorizedException("El usuario no tiene un rol asignado");
         }

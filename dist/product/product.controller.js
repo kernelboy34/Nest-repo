@@ -60,8 +60,8 @@ let ProductController = class ProductController {
             image: `data:image/jpeg;base64,${image.toString('base64')}`,
         });
     }
-    update(id, updateProductDto) {
-        return this.productService.update(+id, updateProductDto);
+    update(id, updateProductDto, image) {
+        return this.productService.update(+id, updateProductDto, image);
     }
     remove(id) {
         return this.productService.remove(+id);
@@ -95,7 +95,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ProductController.prototype, "create", null);
 __decorate([
-    (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true, whitelist: true, transformOptions: { enableImplicitConversion: true }, })),
+    (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true, whitelist: true })),
     (0, common_1.UseGuards)(rols_guard_1.RolesGuard),
     (0, common_1.Get)('findAll'),
     (0, swagger_1.ApiOperation)({ summary: "Listar un nuevo producto" }),
@@ -112,7 +112,7 @@ __decorate([
     (0, rol_decorator_1.Roles)('Administrador', 'Usuario'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], ProductController.prototype, "findOne", null);
 __decorate([
@@ -132,19 +132,29 @@ __decorate([
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], ProductController.prototype, "fetchByIdWithImage", null);
 __decorate([
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     (0, common_1.UseGuards)(rols_guard_1.RolesGuard),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
+        storage: (0, multer_1.diskStorage)({
+            destination: './uploads',
+            filename: (req, file, cb) => {
+                const fileName = `${(0, uuid_1.v4)()}${path.extname(file.originalname)}`;
+                cb(null, fileName);
+            },
+        }),
+    })),
     (0, common_1.Patch)('updateOne/:id'),
     (0, swagger_1.ApiOperation)({ summary: "Actualizar un producto segun el id" }),
     (0, rol_decorator_1.Roles)('Administrador'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_product_dto_1.UpdateProductDto]),
+    __metadata("design:paramtypes", [Number, update_product_dto_1.UpdateProductDto, Object]),
     __metadata("design:returntype", void 0)
 ], ProductController.prototype, "update", null);
 __decorate([
@@ -155,7 +165,7 @@ __decorate([
     (0, rol_decorator_1.Roles)('Administrador'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], ProductController.prototype, "remove", null);
 exports.ProductController = ProductController = __decorate([

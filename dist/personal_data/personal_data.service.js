@@ -16,10 +16,15 @@ exports.PersonalDataService = void 0;
 const common_1 = require("@nestjs/common");
 const sequelize_1 = require("sequelize");
 let PersonalDataService = class PersonalDataService {
-    constructor(personaldataRepository) {
+    constructor(personaldataRepository, userRepository) {
         this.personaldataRepository = personaldataRepository;
+        this.userRepository = userRepository;
     }
     async create(data) {
+        const userExist = await this.userRepository.findByPk(data.user_iduser);
+        if (!userExist) {
+            throw new common_1.NotFoundException("El Usuario no existe");
+        }
         return await this.personaldataRepository.create({
             user_iduser: data.user_iduser,
             name: data.name,
@@ -52,6 +57,12 @@ let PersonalDataService = class PersonalDataService {
         return personaldataFound;
     }
     async update(id, data) {
+        if (data.user_iduser) {
+            const userExist = await this.userRepository.findByPk(data.user_iduser);
+            if (!userExist) {
+                throw new common_1.NotFoundException("El usuario no existe");
+            }
+        }
         const [personaldataUpdate] = await this.personaldataRepository.update(data, {
             where: {
                 idpersonal_data: {
@@ -85,6 +96,7 @@ exports.PersonalDataService = PersonalDataService;
 exports.PersonalDataService = PersonalDataService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)("PERSONAL_DATAS_REPOSITORY")),
-    __metadata("design:paramtypes", [Object])
+    __param(1, (0, common_1.Inject)("USERS_REPOSITORY")),
+    __metadata("design:paramtypes", [Object, Object])
 ], PersonalDataService);
 //# sourceMappingURL=personal_data.service.js.map

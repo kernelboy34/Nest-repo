@@ -16,10 +16,15 @@ exports.BillService = void 0;
 const common_1 = require("@nestjs/common");
 const sequelize_1 = require("sequelize");
 let BillService = class BillService {
-    constructor(billRepository) {
+    constructor(billRepository, saleRepository) {
         this.billRepository = billRepository;
+        this.saleRepository = saleRepository;
     }
     async create(data) {
+        const saleExist = await this.saleRepository.findByPk(data.sales_idsales);
+        if (!saleExist) {
+            throw new common_1.NotFoundException("La venta no existe");
+        }
         return await this.billRepository.create({
             sales_idsales: data.sales_idsales,
             total_price: data.total_price
@@ -48,6 +53,12 @@ let BillService = class BillService {
         return billFound;
     }
     async update(id, data) {
+        if (data.sales_idsales) {
+            const saleExist = await this.saleRepository.findByPk(data.sales_idsales);
+            if (!saleExist) {
+                throw new common_1.NotFoundException("La venta no existe");
+            }
+        }
         const billUpdate = await this.billRepository.update(data, {
             where: {
                 idbills: {
@@ -81,6 +92,7 @@ exports.BillService = BillService;
 exports.BillService = BillService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)("BILLS_REPOSITORY")),
-    __metadata("design:paramtypes", [Object])
+    __param(1, (0, common_1.Inject)("SALES_REPOSITORY")),
+    __metadata("design:paramtypes", [Object, Object])
 ], BillService);
 //# sourceMappingURL=bill.service.js.map

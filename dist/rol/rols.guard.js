@@ -37,9 +37,6 @@ let RolesGuard = class RolesGuard extends auth_guard_1.JwtAuthGuard {
         }
         const request = context.switchToHttp().getRequest();
         const user = request.user;
-        console.log("data:", user);
-        console.log("Usuario:", user);
-        console.log("Rols:", user.rol);
         const userRole = await this.rolRepository.findOne({
             where: {
                 name: {

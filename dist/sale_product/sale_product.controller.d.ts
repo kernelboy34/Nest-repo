@@ -6,7 +6,7 @@ export declare class SaleProductController {
     constructor(saleProductService: SaleProductService);
     create(createSaleProductDto: CreateSaleProductDto): Promise<import("./entities/sale_product.entity").SaleProduct>;
     findAll(): Promise<import("./entities/sale_product.entity").SaleProduct[]>;
-    findOne(id: string): Promise<import("./entities/sale_product.entity").SaleProduct>;
+    findOne(id: number): Promise<import("./entities/sale_product.entity").SaleProduct>;
     update(id: number, updateSaleProductDto: UpdateSaleProductDto): Promise<{
         message: string;
         status: number;

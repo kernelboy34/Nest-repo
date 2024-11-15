@@ -34,7 +34,7 @@ export class SaleProductController {
   @Get('findOne/:id')
   @ApiOperation({summary: "Listar una venta de producto segun el id"})
   @Roles('Usuario', 'Administrador')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.saleProductService.findOne(+id);
   }
 

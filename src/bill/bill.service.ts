@@ -3,15 +3,22 @@ import { CreateBillDto } from './dto/create-bill.dto';
 import { UpdateBillDto } from './dto/update-bill.dto';
 import { Bill } from './entities/bill.entity';
 import { Op } from 'sequelize';
+import { Sale } from 'src/sale/entities/sale.entity';
 
 @Injectable()
 export class BillService {
   constructor(
     @Inject("BILLS_REPOSITORY")
-    private billRepository: typeof Bill
+    private billRepository: typeof Bill,
+    @Inject("SALES_REPOSITORY")
+    private saleRepository: typeof Sale
   ){}
 
   async create(data: CreateBillDto): Promise<Bill>{
+    const saleExist = await this.saleRepository.findByPk(data.sales_idsales)
+    if(!saleExist){
+      throw new NotFoundException("La venta no existe")
+    }
     return await this.billRepository.create({
       sales_idsales: data.sales_idsales,
       total_price: data.total_price
@@ -43,6 +50,12 @@ export class BillService {
   }
 
   async update(id: number, data: UpdateBillDto) {
+    if(data.sales_idsales){
+      const saleExist = await this.saleRepository.findByPk(data.sales_idsales)
+      if(!saleExist){
+        throw new NotFoundException("La venta no existe")
+      }
+    }
     const billUpdate = await this.billRepository.update(data, {
       where:{
         idbills:{

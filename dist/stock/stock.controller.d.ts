@@ -6,13 +6,13 @@ export declare class StockController {
     constructor(stockService: StockService);
     create(createStockDto: CreateStockDto): Promise<import("./entities/stock.entity").Stock>;
     findAll(): Promise<import("./entities/stock.entity").Stock[]>;
-    findOne(id: string): Promise<import("./entities/stock.entity").Stock>;
-    update(id: string, updateStockDto: UpdateStockDto): Promise<{
+    findOne(id: number): Promise<import("./entities/stock.entity").Stock>;
+    update(id: number, updateStockDto: UpdateStockDto): Promise<{
         message: string;
         status: number;
         data: UpdateStockDto;
     }>;
-    remove(id: string): Promise<{
+    remove(id: number): Promise<{
         message: string;
         status: number;
     }>;

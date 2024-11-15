@@ -23,7 +23,7 @@ exports.DepartmentsModule = DepartmentsModule = __decorate([
         controllers: [departments_controller_1.DepartmentsController],
         providers: [departments_service_1.DepartmentsService, ...departments_provider_1.departmentsProvider],
         imports: [sequelize_1.SequelizeModule.forFeature([department_entity_1.Department]), sequelize_provider_1.SequelizeProvider, rols_module_1.RolsModule],
-        exports: [departments_service_1.DepartmentsService]
+        exports: [departments_service_1.DepartmentsService, DepartmentsModule]
     })
 ], DepartmentsModule);
 //# sourceMappingURL=departments.module.js.map

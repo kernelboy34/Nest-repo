@@ -16,10 +16,20 @@ exports.SaleProductService = void 0;
 const common_1 = require("@nestjs/common");
 const sequelize_1 = require("sequelize");
 let SaleProductService = class SaleProductService {
-    constructor(saleproductsRepository) {
+    constructor(saleproductsRepository, saleRepository, productRepository) {
         this.saleproductsRepository = saleproductsRepository;
+        this.saleRepository = saleRepository;
+        this.productRepository = productRepository;
     }
     async create(data) {
+        const saleExist = await this.saleRepository.findByPk(data.sales_idsales);
+        if (!saleExist) {
+            throw new common_1.NotFoundException("La venta no existe");
+        }
+        const productExist = await this.productRepository.findByPk(data.products_idproducts);
+        if (!productExist) {
+            throw new common_1.NotFoundException("El producto no existe");
+        }
         return await this.saleproductsRepository.create({
             sales_idsales: data.sales_idsales,
             products_idproducts: data.products_idproducts,
@@ -53,6 +63,18 @@ let SaleProductService = class SaleProductService {
         return saleproductFound;
     }
     async update(id, data) {
+        if (data.products_idproducts) {
+            const productExist = await this.productRepository.findByPk(data.products_idproducts);
+            if (!productExist) {
+                throw new common_1.NotFoundException("El producto no existe");
+            }
+        }
+        if (data.sales_idsales) {
+            const saleExist = await this.saleRepository.findByPk(data.sales_idsales);
+            if (!saleExist) {
+                throw new common_1.NotFoundException("La venta no existe");
+            }
+        }
         const [saleproductsUpdate] = await this.saleproductsRepository.update(data, {
             where: {
                 idsale_products: {
@@ -86,6 +108,8 @@ exports.SaleProductService = SaleProductService;
 exports.SaleProductService = SaleProductService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)("SALE_PRODUCTS_REPOSITORY")),
-    __metadata("design:paramtypes", [Object])
+    __param(1, (0, common_1.Inject)("SALES_REPOSITORY")),
+    __param(2, (0, common_1.Inject)("PRODUCTS_REPOSITORY")),
+    __metadata("design:paramtypes", [Object, Object, Object])
 ], SaleProductService);
 //# sourceMappingURL=sale_product.service.js.map

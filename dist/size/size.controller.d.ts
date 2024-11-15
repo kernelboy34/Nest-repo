@@ -6,13 +6,13 @@ export declare class SizeController {
     constructor(sizesService: SizeService);
     create(createSizeDto: CreateSizeDto): Promise<import("./entities/size.entity").Size>;
     findAll(): Promise<import("./entities/size.entity").Size[]>;
-    findOne(id: string): Promise<import("./entities/size.entity").Size>;
-    update(id: string, updateSizeDto: UpdateSizeDto): Promise<{
+    findOne(id: number): Promise<import("./entities/size.entity").Size>;
+    update(id: number, updateSizeDto: UpdateSizeDto): Promise<{
         message: string;
         status: number;
         data: UpdateSizeDto;
     }>;
-    remove(id: string): Promise<{
+    remove(id: number): Promise<{
         message: string;
         status: number;
     }>;

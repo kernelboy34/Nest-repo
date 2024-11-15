@@ -68,7 +68,7 @@ __decorate([
     (0, rol_decorator_1.Roles)('Administrador', 'Usuario'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], BillController.prototype, "findOne", null);
 __decorate([
@@ -82,7 +82,7 @@ __decorate([
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_bill_dto_1.UpdateBillDto]),
+    __metadata("design:paramtypes", [Number, update_bill_dto_1.UpdateBillDto]),
     __metadata("design:returntype", void 0)
 ], BillController.prototype, "update", null);
 __decorate([
@@ -95,7 +95,7 @@ __decorate([
     (0, rol_decorator_1.Roles)('Administrador'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], BillController.prototype, "remove", null);
 exports.BillController = BillController = __decorate([

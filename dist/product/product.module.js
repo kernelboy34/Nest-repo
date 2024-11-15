@@ -22,7 +22,7 @@ exports.ProductModule = ProductModule = __decorate([
     (0, common_1.Module)({
         controllers: [product_controller_1.ProductController],
         providers: [product_service_1.ProductService, ...product_provide_1.productProvider],
-        exports: [product_service_1.ProductService],
+        exports: [ProductModule],
         imports: [sequelize_1.SequelizeModule.forFeature([product_entity_1.Product]), sequelize_provider_1.SequelizeProvider, rols_module_1.RolsModule]
     })
 ], ProductModule);

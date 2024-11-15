@@ -8,7 +8,7 @@ export declare class ProductService {
     findAll(): Promise<Product[]>;
     findOne(id: number): Promise<Product>;
     paginateProducts(take: number, skip: number): Promise<Product[]>;
-    update(id: number, data: UpdateProductDto): Promise<{
+    update(id: number, data: UpdateProductDto, file?: Express.Multer.File): Promise<{
         message: string;
         status: number;
         data: UpdateProductDto;

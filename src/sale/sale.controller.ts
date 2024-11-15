@@ -27,7 +27,7 @@ export class SaleController {
 
   @Get('findOne/:id')
   @ApiOperation({summary: "Listar una venta segun el id"})
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.saleService.findOne(+id);
   }
 
@@ -37,7 +37,7 @@ export class SaleController {
   }))
   @Patch('updateOne/:id')
   @ApiOperation({summary: "Actualizar una venta por el id"})
-  update(@Param('id') id: string, @Body() updateSaleDto: UpdateSaleDto) {
+  update(@Param('id') id: number, @Body() updateSaleDto: UpdateSaleDto) {
     return this.saleService.update(+id, updateSaleDto);
   }
 
@@ -47,7 +47,7 @@ export class SaleController {
   }))
   @Delete('deleteOne/:id')
   @ApiOperation({summary: "Eliminar una venta por el id"})
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.saleService.remove(+id);
   }
 }

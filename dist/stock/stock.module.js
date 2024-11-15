@@ -16,14 +16,20 @@ const stock_entity_1 = require("./entities/stock.entity");
 const sequelize_provider_1 = require("../sequelize/sequelize.provider");
 const stock_provider_1 = require("./provider/stock.provider");
 const rols_module_1 = require("../rol/rols.module");
+const product_entity_1 = require("../product/entities/product.entity");
+const department_entity_1 = require("../department/entities/department.entity");
+const departments_module_1 = require("../department/departments.module");
+const departments_provider_1 = require("../department/provider/departments.provider");
+const product_module_1 = require("../product/product.module");
+const product_provide_1 = require("../product/provide/product.provide");
 let StockModule = class StockModule {
 };
 exports.StockModule = StockModule;
 exports.StockModule = StockModule = __decorate([
     (0, common_1.Module)({
         controllers: [stock_controller_1.StockController],
-        providers: [stock_service_1.StockService, rols_guard_1.RolesGuard, ...stock_provider_1.stockProvider],
-        imports: [sequelize_1.SequelizeModule.forFeature([stock_entity_1.Stock]), sequelize_provider_1.SequelizeProvider, rols_module_1.RolsModule]
+        providers: [stock_service_1.StockService, rols_guard_1.RolesGuard, ...stock_provider_1.stockProvider, ...departments_provider_1.departmentsProvider, ...product_provide_1.productProvider],
+        imports: [sequelize_1.SequelizeModule.forFeature([stock_entity_1.Stock, product_entity_1.Product, department_entity_1.Department]), sequelize_provider_1.SequelizeProvider, rols_module_1.RolsModule, departments_module_1.DepartmentsModule, product_module_1.ProductModule]
     })
 ], StockModule);
 //# sourceMappingURL=stock.module.js.map

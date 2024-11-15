@@ -1,9 +1,11 @@
 import { CreateUserDto } from "./dto/createUser.dto";
 import { UpdateUserDto } from "./dto/updateUser.dto";
 import { User } from "./entity/user.entity";
+import { Rol } from "src/rol/entity/rol.entity";
 export declare class UserService {
     private userRepository;
-    constructor(userRepository: typeof User);
+    private rolRepository;
+    constructor(userRepository: typeof User, rolRepository: typeof Rol);
     create(data: CreateUserDto): Promise<User>;
     findOne(email: string): Promise<User>;
     findAll(): Promise<User[]>;

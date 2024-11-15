@@ -34,7 +34,7 @@ export class PersonalDataController {
   @Get('findOne/:id')
   @ApiOperation({summary: "Listar un dato personal segun el id"})
   @Roles('Administrador', 'Usuario')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.personalDataService.findOne(+id);
   }
 
@@ -45,7 +45,7 @@ export class PersonalDataController {
   @Patch('updateOne/:id')
   @ApiOperation({summary: "Actualizar un dato personal segun el id"})
   @Roles('Usuario', 'Administrador')
-  update(@Param('id') id: string, @Body() updatePersonalDatumDto: UpdatePersonalDatumDto) {
+  update(@Param('id') id: number, @Body() updatePersonalDatumDto: UpdatePersonalDatumDto) {
     return this.personalDataService.update(+id, updatePersonalDatumDto);
   }
 
@@ -56,7 +56,7 @@ export class PersonalDataController {
   @Delete('deleteOne/:id')
   @ApiOperation({summary: "Eliminar un dato personal segun el id"})
   @Roles('Administrador')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.personalDataService.remove(+id);
   }
 }

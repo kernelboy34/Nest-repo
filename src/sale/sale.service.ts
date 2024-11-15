@@ -3,14 +3,22 @@ import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
 import { Sale } from './entities/sale.entity';
 import { Op } from 'sequelize';
+import { User } from 'src/user/entity/user.entity';
 
 @Injectable()
 export class SaleService {
   constructor(
     @Inject("SALES_REPOSITORY")
-    private saleRepository: typeof Sale
+    private saleRepository: typeof Sale,
+    @Inject("USERS_REPOSITORY")
+    private userRepository: typeof User
   ){}
   async create(data: CreateSaleDto): Promise<Sale>{
+    const userExists = await this.userRepository.findByPk(data.user_iduser)
+    if(!userExists){
+      throw new NotFoundException("El usuario no existe")
+    }
+
     return await this.saleRepository.create({
       user_iduser: data.user_iduser,
       status: data.status
@@ -47,6 +55,13 @@ export class SaleService {
   }
 
   async update(id: number, data: UpdateSaleDto){
+    if(data.user_iduser){
+      const userExist = await this.userRepository.findByPk(data.user_iduser)
+      if(!userExist){
+        throw new NotFoundException("El usuario no existe")
+      }
+    }
+
     const [saleUpdate] = await this.saleRepository.update(data, {
       where:{
         idsales:{

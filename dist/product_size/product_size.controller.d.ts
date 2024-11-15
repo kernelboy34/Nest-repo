@@ -6,13 +6,13 @@ export declare class ProductSizeController {
     constructor(productSizeService: ProductSizeService);
     create(createProductSizeDto: CreateProductSizeDto): Promise<import("./entities/product_size.entity").ProductSize>;
     findAll(): Promise<import("./entities/product_size.entity").ProductSize[]>;
-    findOne(id: string): Promise<import("./entities/product_size.entity").ProductSize>;
-    update(id: string, updateProductSizeDto: UpdateProductSizeDto): Promise<{
+    findOne(id: number): Promise<import("./entities/product_size.entity").ProductSize>;
+    update(id: number, updateProductSizeDto: UpdateProductSizeDto): Promise<{
         message: string;
         status: number;
         data: UpdateProductSizeDto;
     }>;
-    remove(id: string): Promise<{
+    remove(id: number): Promise<{
         message: string;
         status: number;
     }>;

@@ -6,10 +6,14 @@ import { SaleProduct } from './entities/sale_product.entity';
 import { SequelizeProvider } from 'src/sequelize/sequelize.provider';
 import { RolsModule } from 'src/rol/rols.module';
 import { saleproductProvider } from './provide/sale_product.provide';
+import { ProductModule } from 'src/product/product.module';
+import { SaleModule } from 'src/sale/sale.module';
+import { saleProvider } from 'src/sale/provide/sale.provide';
+import { productProvider } from 'src/product/provide/product.provide';
 
 @Module({
   controllers: [SaleProductController],
-  providers: [SaleProductService, ...saleproductProvider],
-  imports:[SequelizeModule.forFeature([SaleProduct]), SequelizeProvider, RolsModule]
+  providers: [SaleProductService, ...saleproductProvider, ...productProvider, ...saleProvider],
+  imports:[SequelizeModule.forFeature([SaleProduct]), SequelizeProvider, RolsModule, ProductModule, SaleModule]
 })
 export class SaleProductModule {}

@@ -29,7 +29,7 @@ exports.UserModule = UserModule = __decorate([
             ...user_provider_1.usersProvider,
             ...rols_provider_1.rolProvider
         ],
-        exports: [user_service_1.UserService],
+        exports: [UserModule, user_service_1.UserService],
         imports: [sequelize_1.SequelizeModule.forFeature([user_entity_1.User]), sequelize_provider_1.SequelizeProvider, rols_module_1.RolsModule]
     })
 ], UserModule);

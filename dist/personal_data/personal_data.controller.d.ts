@@ -6,13 +6,13 @@ export declare class PersonalDataController {
     constructor(personalDataService: PersonalDataService);
     create(data: CreatePersonalDatumDto): Promise<import("./entities/personal_datum.entity").PersonalDatum>;
     findAll(): Promise<import("./entities/personal_datum.entity").PersonalDatum[]>;
-    findOne(id: string): Promise<import("./entities/personal_datum.entity").PersonalDatum>;
-    update(id: string, updatePersonalDatumDto: UpdatePersonalDatumDto): Promise<{
+    findOne(id: number): Promise<import("./entities/personal_datum.entity").PersonalDatum>;
+    update(id: number, updatePersonalDatumDto: UpdatePersonalDatumDto): Promise<{
         message: string;
         status: number;
         data: UpdatePersonalDatumDto;
     }>;
-    remove(id: string): Promise<{
+    remove(id: number): Promise<{
         message: string;
         status: number;
     }>;

@@ -20,8 +20,9 @@ const config_1 = require("../config/config");
 const sequelize_1 = require("sequelize");
 const rol_entity_1 = require("../rol/entity/rol.entity");
 let UserService = class UserService {
-    constructor(userRepository) {
+    constructor(userRepository, rolRepository) {
         this.userRepository = userRepository;
+        this.rolRepository = rolRepository;
     }
     async create(data) {
         let ValidEmail = false;
@@ -32,6 +33,10 @@ let UserService = class UserService {
         });
         if (!ValidEmail) {
             throw new common_1.UnauthorizedException("Dominio de correo no permitido");
+        }
+        const rolExist = await this.rolRepository.findByPk(data.rols_idrols);
+        if (!rolExist) {
+            throw new common_1.NotFoundException("Rol no existente");
         }
         data.password = await bt.hash(data.password, config_1.config.salt);
         return await this.userRepository.create({
@@ -53,7 +58,13 @@ let UserService = class UserService {
         return await UserFound;
     }
     async findAll() {
-        return await this.userRepository.findAll();
+        return await this.userRepository.findAll({
+            where: {
+                is_deleted: {
+                    [sequelize_1.Op.ne]: 1
+                }
+            }
+        });
     }
     async findUserRole(userId) {
         return await this.userRepository.findOne({
@@ -82,6 +93,15 @@ let UserService = class UserService {
         return await userFound;
     }
     async update(data, id) {
+        if (data.password) {
+            data.password = await bt.hash(data.password, config_1.config.salt);
+        }
+        if (data.rols_idrols) {
+            const rolExists = await this.rolRepository.findByPk(data.rols_idrols);
+            if (!rolExists) {
+                throw new common_1.NotFoundException("Rol no existente");
+            }
+        }
         const [userUpdate] = await this.userRepository.update(data, {
             where: {
                 iduser: {
@@ -113,6 +133,7 @@ exports.UserService = UserService;
 exports.UserService = UserService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)('USERS_REPOSITORY')),
-    __metadata("design:paramtypes", [Object])
+    __param(1, (0, common_1.Inject)("ROLS_REPOSITORY")),
+    __metadata("design:paramtypes", [Object, Object])
 ], UserService);
 //# sourceMappingURL=user.service.js.map

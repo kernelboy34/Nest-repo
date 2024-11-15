@@ -11,6 +11,6 @@ import { RolsModule } from 'src/rol/rols.module';
   controllers: [DepartmentsController],
   providers: [DepartmentsService, ...departmentsProvider],
   imports: [SequelizeModule.forFeature([Department]), SequelizeProvider, RolsModule],
-  exports:[DepartmentsService]
+  exports:[DepartmentsService, DepartmentsModule]
 })
 export class DepartmentsModule {}

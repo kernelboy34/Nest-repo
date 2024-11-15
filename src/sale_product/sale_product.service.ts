@@ -3,14 +3,30 @@ import { CreateSaleProductDto } from './dto/create-sale_product.dto';
 import { UpdateSaleProductDto } from './dto/update-sale_product.dto';
 import { SaleProduct } from './entities/sale_product.entity';
 import { Op } from 'sequelize';
+import { Sale } from 'src/sale/entities/sale.entity';
+import { Product } from 'src/product/entities/product.entity';
 
 @Injectable()
 export class SaleProductService {
   constructor(
     @Inject("SALE_PRODUCTS_REPOSITORY")
-    private saleproductsRepository: typeof SaleProduct
+    private saleproductsRepository: typeof SaleProduct,
+    @Inject("SALES_REPOSITORY")
+    private saleRepository: typeof Sale,
+    @Inject("PRODUCTS_REPOSITORY")
+    private productRepository: typeof Product
   ){}
   async create(data: CreateSaleProductDto): Promise<SaleProduct>{
+
+    const saleExist = await this.saleRepository.findByPk(data.sales_idsales)
+    if(!saleExist){
+      throw new NotFoundException("La venta no existe")
+    }
+    const productExist = await this.productRepository.findByPk(data.products_idproducts)
+    if(!productExist){
+      throw new NotFoundException("El producto no existe")
+    }
+
     return await this.saleproductsRepository.create({
       sales_idsales:data.sales_idsales,
       products_idproducts: data.products_idproducts,
@@ -47,6 +63,20 @@ export class SaleProductService {
   }
 
   async update(id: number, data: UpdateSaleProductDto) {
+    if(data.products_idproducts){
+      const productExist = await this.productRepository.findByPk(data.products_idproducts)
+      if(!productExist){
+        throw new NotFoundException("El producto no existe")
+      }
+    }
+
+    if(data.sales_idsales){
+      const saleExist = await this.saleRepository.findByPk(data.sales_idsales)
+      if(!saleExist){
+        throw new NotFoundException("La venta no existe")
+      }
+    }
+
     const [saleproductsUpdate] = await this.saleproductsRepository.update(data,{
       where:{
         idsale_products:{

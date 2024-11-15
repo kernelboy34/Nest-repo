@@ -42,7 +42,7 @@ export class ProductController {
         return this.productService.create(createProductDto);
     }
 
-    @UsePipes(new ValidationPipe({transform: true , whitelist: true, transformOptions: { enableImplicitConversion: true },}))
+    @UsePipes(new ValidationPipe({transform: true , whitelist: true}))
     @UseGuards(RolesGuard)
     @Get('findAll')
     @ApiOperation({summary: "Listar un nuevo producto"})
@@ -56,7 +56,7 @@ export class ProductController {
     @Get('findOne/:id')
     @ApiOperation({summary: "Listar un producto segun el id"})
     @Roles('Administrador', 'Usuario')
-    findOne(@Param('id') id: string) {
+    findOne(@Param('id') id: number) {
         return this.productService.findOne(+id);
     }
 
@@ -70,7 +70,7 @@ export class ProductController {
     @UseGuards(RolesGuard)
     @Get('fetchByIdWithImage/:id')
     @Roles('Administrador')
-    async fetchByIdWithImage(@Param('id') id: string, @Res() res: Response) {
+    async fetchByIdWithImage(@Param('id') id: number, @Res() res: Response) {
         const product = await this.productService.findOne(+id);
         
         if (!product) {
@@ -96,11 +96,21 @@ export class ProductController {
 
     @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
     @UseGuards(RolesGuard)
+    @UseInterceptors(FileInterceptor('file', {
+        storage: diskStorage({
+          destination: './uploads', // el mismo directorio
+          filename: (req, file, cb) => {
+            const fileName = `${uuidv4()}${path.extname(file.originalname)}`;
+            cb(null, fileName);
+          },
+        }),
+      }))
+      
     @Patch('updateOne/:id')
     @ApiOperation({summary: "Actualizar un producto segun el id"})
     @Roles('Administrador')
-    update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-        return this.productService.update(+id, updateProductDto);
+    update(@Param('id') id: number, @Body() updateProductDto: UpdateProductDto, @UploadedFile() image?:Express.Multer.File){
+        return this.productService.update(+id, updateProductDto, image);
     }
 
     @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
@@ -108,7 +118,7 @@ export class ProductController {
     @Delete('deleteOne/:id')
     @ApiOperation({summary: "Eliminar un producto segun el id"})
     @Roles('Administrador')
-    remove(@Param('id') id: string) {
+    remove(@Param('id') id: number) {
         return this.productService.remove(+id);
     }
 

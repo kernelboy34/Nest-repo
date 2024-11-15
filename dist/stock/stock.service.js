@@ -16,10 +16,20 @@ exports.StockService = void 0;
 const common_1 = require("@nestjs/common");
 const sequelize_1 = require("sequelize");
 let StockService = class StockService {
-    constructor(stockRepository) {
+    constructor(stockRepository, departmentRepository, productRepository) {
         this.stockRepository = stockRepository;
+        this.departmentRepository = departmentRepository;
+        this.productRepository = productRepository;
     }
     async create(data) {
+        const departmentExists = await this.departmentRepository.findByPk(data.branches_idbranches);
+        if (!departmentExists) {
+            throw new common_1.NotFoundException("El departamento no existe");
+        }
+        const productExists = await this.productRepository.findByPk(data.products_idproducts);
+        if (!productExists) {
+            throw new common_1.NotFoundException("El producto no existe");
+        }
         return await this.stockRepository.create({
             branches_idbranches: data.branches_idbranches,
             products_idproducts: data.products_idproducts,
@@ -52,6 +62,18 @@ let StockService = class StockService {
         return stockFound;
     }
     async update(id, data) {
+        if (data.branches_idbranches) {
+            const departmentExist = await this.departmentRepository.findByPk(data.branches_idbranches);
+            if (!departmentExist) {
+                throw new common_1.NotFoundException("El departamento no existe");
+            }
+        }
+        if (data.products_idproducts) {
+            const productExist = await this.productRepository.findByPk(data.products_idproducts);
+            if (!productExist) {
+                throw new common_1.NotFoundException("El producto no existe");
+            }
+        }
         const [stockUpdate] = await this.stockRepository.update(data, {
             where: {
                 idstocks: {
@@ -85,6 +107,8 @@ exports.StockService = StockService;
 exports.StockService = StockService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)("STOCKS_REPOSITORY")),
-    __metadata("design:paramtypes", [Object])
+    __param(1, (0, common_1.Inject)("DEPARTMENTS_REPOSITORY")),
+    __param(2, (0, common_1.Inject)("PRODUCTS_REPOSITORY")),
+    __metadata("design:paramtypes", [Object, Object, Object])
 ], StockService);
 //# sourceMappingURL=stock.service.js.map

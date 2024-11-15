@@ -6,13 +6,13 @@ export declare class BillController {
     constructor(billService: BillService);
     create(createBillDto: CreateBillDto): Promise<import("./entities/bill.entity").Bill>;
     findAll(): Promise<import("./entities/bill.entity").Bill[]>;
-    findOne(id: string): Promise<import("./entities/bill.entity").Bill>;
-    update(id: string, updateBillDto: UpdateBillDto): Promise<{
+    findOne(id: number): Promise<import("./entities/bill.entity").Bill>;
+    update(id: number, updateBillDto: UpdateBillDto): Promise<{
         message: string;
         status: number;
         data: UpdateBillDto;
     }>;
-    remove(id: string): Promise<{
+    remove(id: number): Promise<{
         message: string;
         status: number;
     }>;

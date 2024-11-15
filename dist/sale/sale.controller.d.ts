@@ -6,13 +6,13 @@ export declare class SaleController {
     constructor(saleService: SaleService);
     create(createSaleDto: CreateSaleDto): Promise<import("./entities/sale.entity").Sale>;
     findAll(): Promise<import("./entities/sale.entity").Sale[]>;
-    findOne(id: string): Promise<import("./entities/sale.entity").Sale>;
-    update(id: string, updateSaleDto: UpdateSaleDto): Promise<{
+    findOne(id: number): Promise<import("./entities/sale.entity").Sale>;
+    update(id: number, updateSaleDto: UpdateSaleDto): Promise<{
         message: string;
         status: number;
         data: UpdateSaleDto;
     }>;
-    remove(id: string): Promise<{
+    remove(id: number): Promise<{
         message: string;
         status: number;
     }>;

@@ -18,7 +18,7 @@ import { RolsModule } from "src/rol/rols.module";
         ...usersProvider,
         ...rolProvider
     ],
-    exports:[UserService],
+    exports:[UserModule, UserService],
     imports:[SequelizeModule.forFeature([User]), SequelizeProvider, RolsModule]
 })
 

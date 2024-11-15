@@ -34,7 +34,7 @@ export class SizeController {
   @ApiOperation({summary: "Listar un tamaño por el id"})
   @Get('findOne/:id')
   @Roles('Administrador', 'Usuario')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.sizesService.findOne(+id);
   }
 
@@ -45,7 +45,7 @@ export class SizeController {
   @Patch('updateOne/:id')
   @ApiOperation({summary: "Actualizar un un tamaño por segun el id"})
   @Roles('Administrador')
-  update(@Param('id') id: string, @Body() updateSizeDto: UpdateSizeDto) {
+  update(@Param('id') id: number, @Body() updateSizeDto: UpdateSizeDto) {
     return this.sizesService.update(+id, updateSizeDto);
   }
 
@@ -56,7 +56,7 @@ export class SizeController {
   @Delete('deleteOne/:id')
   @ApiOperation({summary: "Eliminar un tamaño segun el id "})
   @Roles('Administrador')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.sizesService.delete(+id);
   }
 }

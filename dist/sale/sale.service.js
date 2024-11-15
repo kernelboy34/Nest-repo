@@ -16,10 +16,15 @@ exports.SaleService = void 0;
 const common_1 = require("@nestjs/common");
 const sequelize_1 = require("sequelize");
 let SaleService = class SaleService {
-    constructor(saleRepository) {
+    constructor(saleRepository, userRepository) {
         this.saleRepository = saleRepository;
+        this.userRepository = userRepository;
     }
     async create(data) {
+        const userExists = await this.userRepository.findByPk(data.user_iduser);
+        if (!userExists) {
+            throw new common_1.NotFoundException("El usuario no existe");
+        }
         return await this.saleRepository.create({
             user_iduser: data.user_iduser,
             status: data.status
@@ -51,6 +56,12 @@ let SaleService = class SaleService {
         return saleFound;
     }
     async update(id, data) {
+        if (data.user_iduser) {
+            const userExist = await this.userRepository.findByPk(data.user_iduser);
+            if (!userExist) {
+                throw new common_1.NotFoundException("El usuario no existe");
+            }
+        }
         const [saleUpdate] = await this.saleRepository.update(data, {
             where: {
                 idsales: {
@@ -81,6 +92,7 @@ exports.SaleService = SaleService;
 exports.SaleService = SaleService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)("SALES_REPOSITORY")),
-    __metadata("design:paramtypes", [Object])
+    __param(1, (0, common_1.Inject)("USERS_REPOSITORY")),
+    __metadata("design:paramtypes", [Object, Object])
 ], SaleService);
 //# sourceMappingURL=sale.service.js.map

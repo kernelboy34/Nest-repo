@@ -68,7 +68,7 @@ __decorate([
     (0, rol_decorator_1.Roles)('Usuario', 'Administrador'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], SaleProductController.prototype, "findOne", null);
 __decorate([

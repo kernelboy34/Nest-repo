@@ -15,14 +15,18 @@ const sale_product_entity_1 = require("./entities/sale_product.entity");
 const sequelize_provider_1 = require("../sequelize/sequelize.provider");
 const rols_module_1 = require("../rol/rols.module");
 const sale_product_provide_1 = require("./provide/sale_product.provide");
+const product_module_1 = require("../product/product.module");
+const sale_module_1 = require("../sale/sale.module");
+const sale_provide_1 = require("../sale/provide/sale.provide");
+const product_provide_1 = require("../product/provide/product.provide");
 let SaleProductModule = class SaleProductModule {
 };
 exports.SaleProductModule = SaleProductModule;
 exports.SaleProductModule = SaleProductModule = __decorate([
     (0, common_1.Module)({
         controllers: [sale_product_controller_1.SaleProductController],
-        providers: [sale_product_service_1.SaleProductService, ...sale_product_provide_1.saleproductProvider],
-        imports: [sequelize_1.SequelizeModule.forFeature([sale_product_entity_1.SaleProduct]), sequelize_provider_1.SequelizeProvider, rols_module_1.RolsModule]
+        providers: [sale_product_service_1.SaleProductService, ...sale_product_provide_1.saleproductProvider, ...product_provide_1.productProvider, ...sale_provide_1.saleProvider],
+        imports: [sequelize_1.SequelizeModule.forFeature([sale_product_entity_1.SaleProduct]), sequelize_provider_1.SequelizeProvider, rols_module_1.RolsModule, product_module_1.ProductModule, sale_module_1.SaleModule]
     })
 ], SaleProductModule);
 //# sourceMappingURL=sale_product.module.js.map

@@ -3,15 +3,22 @@ import { CreatePersonalDatumDto } from './dto/create-personal_datum.dto';
 import { UpdatePersonalDatumDto } from './dto/update-personal_datum.dto';
 import { PersonalDatum } from './entities/personal_datum.entity';
 import { Op } from 'sequelize';
+import { User } from 'src/user/entity/user.entity';
 
 
 @Injectable()
 export class PersonalDataService {
   constructor(
     @Inject("PERSONAL_DATAS_REPOSITORY")
-    private personaldataRepository: typeof PersonalDatum
+    private personaldataRepository: typeof PersonalDatum,
+    @Inject("USERS_REPOSITORY")
+    private userRepository: typeof User
   ){}
   async create(data: CreatePersonalDatumDto): Promise<PersonalDatum>{
+    const userExist = await this.userRepository.findByPk(data.user_iduser)
+    if(!userExist){
+      throw new NotFoundException("El Usuario no existe")
+    }
     return await this.personaldataRepository.create({
       user_iduser: data.user_iduser,
       name: data.name,
@@ -49,6 +56,13 @@ export class PersonalDataService {
   }
 
   async update(id: number, data: UpdatePersonalDatumDto) {
+    if(data.user_iduser){
+      const userExist = await this.userRepository.findByPk(data.user_iduser)
+      if(!userExist){
+        throw new NotFoundException("El usuario no existe")
+      }
+    }
+    
     const [personaldataUpdate] = await this.personaldataRepository.update(data,{
       where:{
         idpersonal_data:{

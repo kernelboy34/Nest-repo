@@ -16,7 +16,6 @@ export class AuthService{
         }
 
         const userRole = await this.userService.findUserRole(user.iduser);
-        console.log(userRole.role.name)
         if (!userRole) {
             throw new UnauthorizedException("El usuario no tiene un rol asignado");
         }

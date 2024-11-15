@@ -16,10 +16,20 @@ exports.ProductSizeService = void 0;
 const common_1 = require("@nestjs/common");
 const sequelize_1 = require("sequelize");
 let ProductSizeService = class ProductSizeService {
-    constructor(productsizeRepository) {
+    constructor(productsizeRepository, productRepository, sizeRepository) {
         this.productsizeRepository = productsizeRepository;
+        this.productRepository = productRepository;
+        this.sizeRepository = sizeRepository;
     }
     async create(data) {
+        const productExist = await this.productRepository.findByPk(data.products_idproducts);
+        if (!productExist) {
+            throw new common_1.NotFoundException("El producto no existe");
+        }
+        const sizeExist = await this.sizeRepository.findByPk(data.sizes_idsizes);
+        if (!sizeExist) {
+            throw new common_1.NotFoundException("El tamaño no existe");
+        }
         return await this.productsizeRepository.create({
             products_idproducts: data.products_idproducts,
             sizes_idsizes: data.sizes_idsizes,
@@ -52,6 +62,18 @@ let ProductSizeService = class ProductSizeService {
         return productsizeFound;
     }
     async update(id, data) {
+        if (data.products_idproducts) {
+            const productExist = await this.productRepository.findByPk(data.products_idproducts);
+            if (!productExist) {
+                throw new common_1.NotFoundException("El producto no existe");
+            }
+        }
+        if (data.sizes_idsizes) {
+            const sizeExist = await this.sizeRepository.findByPk(data.sizes_idsizes);
+            if (!sizeExist) {
+                throw new common_1.NotFoundException("El tamaño no existe");
+            }
+        }
         const [productsizeFound] = await this.productsizeRepository.update(data, {
             where: {
                 idproduct_sizes: {
@@ -82,6 +104,8 @@ exports.ProductSizeService = ProductSizeService;
 exports.ProductSizeService = ProductSizeService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)("PRODUCTSIZES_REPOSITORY")),
-    __metadata("design:paramtypes", [Object])
+    __param(1, (0, common_1.Inject)("PRODUCTS_REPOSITORY")),
+    __param(2, (0, common_1.Inject)("SIZES_REPOSITORY")),
+    __metadata("design:paramtypes", [Object, Object, Object])
 ], ProductSizeService);
 //# sourceMappingURL=product_size.service.js.map

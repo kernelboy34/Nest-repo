@@ -1,9 +1,11 @@
 import { CreatePersonalDatumDto } from './dto/create-personal_datum.dto';
 import { UpdatePersonalDatumDto } from './dto/update-personal_datum.dto';
 import { PersonalDatum } from './entities/personal_datum.entity';
+import { User } from 'src/user/entity/user.entity';
 export declare class PersonalDataService {
     private personaldataRepository;
-    constructor(personaldataRepository: typeof PersonalDatum);
+    private userRepository;
+    constructor(personaldataRepository: typeof PersonalDatum, userRepository: typeof User);
     create(data: CreatePersonalDatumDto): Promise<PersonalDatum>;
     findAll(): Promise<PersonalDatum[]>;
     findOne(id: number): Promise<PersonalDatum>;

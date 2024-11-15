@@ -12,7 +12,9 @@ import { Rol } from "src/rol/entity/rol.entity";
 export class UserService{
     constructor(
         @Inject('USERS_REPOSITORY')
-        private userRepository: typeof User
+        private userRepository: typeof User,
+        @Inject("ROLS_REPOSITORY")
+        private rolRepository: typeof Rol
     ){}
 
     async create(data: CreateUserDto): Promise<User>{
@@ -24,6 +26,11 @@ export class UserService{
         })
         if(!ValidEmail){
             throw new UnauthorizedException("Dominio de correo no permitido")
+        }
+
+        const rolExist = await this.rolRepository.findByPk(data.rols_idrols)
+        if(!rolExist){
+            throw new NotFoundException("Rol no existente")
         }
         data.password = await bt.hash(data.password, config.salt)
         return await this.userRepository.create({
@@ -47,7 +54,13 @@ export class UserService{
     }
 
     async findAll(): Promise<User[]>{
-        return await this.userRepository.findAll()
+        return await this.userRepository.findAll({
+            where:{
+                is_deleted:{
+                    [Op.ne]:1
+                }
+            }
+        })
     }
 
     async findUserRole(userId: number) {
@@ -79,6 +92,15 @@ export class UserService{
     }
 
     async update(data: UpdateUserDto, id: number){
+        if(data.password){
+            data.password = await bt.hash(data.password, config.salt)
+        }
+        if(data.rols_idrols){
+            const rolExists = await this.rolRepository.findByPk(data.rols_idrols)
+            if(!rolExists){
+                throw new NotFoundException("Rol no existente")
+            }
+        }
         const [userUpdate] = await this.userRepository.update(data, {
             where:{
                 iduser:{

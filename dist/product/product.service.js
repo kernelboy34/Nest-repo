@@ -14,9 +14,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductService = void 0;
 const common_1 = require("@nestjs/common");
-const create_product_dto_1 = require("./dto/create-product.dto");
-const update_product_dto_1 = require("./dto/update-product.dto");
 const sequelize_1 = require("sequelize");
+const fs = require("fs");
+const path = require("path");
 let ProductService = class ProductService {
     constructor(productRepository) {
         this.productRepository = productRepository;
@@ -64,16 +64,30 @@ let ProductService = class ProductService {
             limit: take
         });
     }
-    async update(id, data) {
+    async update(id, data, file) {
+        console.log(file);
+        const existingProduct = await this.productRepository.findByPk(id);
+        if (!existingProduct) {
+            throw new common_1.NotFoundException("Producto no encontrado");
+        }
+        if (file) {
+            if (existingProduct.imageUrl) {
+                const oldImagePath = path.join(__dirname, '..', '..', existingProduct.imageUrl);
+                if (fs.existsSync(oldImagePath)) {
+                    fs.unlinkSync(oldImagePath);
+                }
+            }
+            data.imageUrl = `/uploads/${file.filename}`;
+        }
         const [productUpdate] = await this.productRepository.update(data, {
             where: {
                 idproducts: {
-                    [sequelize_1.Op.eq]: id
-                }
-            }
+                    [sequelize_1.Op.eq]: id,
+                },
+            },
         });
         if (productUpdate === 0) {
-            throw new common_1.NotFoundException("Producto no encontrado");
+            throw new common_1.NotFoundException("Producto a actualizar no encontrado");
         }
         return { message: "Producto actualizado correctamente", status: 200, data };
     }
@@ -95,42 +109,6 @@ let ProductService = class ProductService {
     }
 };
 exports.ProductService = ProductService;
-__decorate([
-    (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true, transformOptions: { enableImplicitConversion: true } })),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_product_dto_1.CreateProductDto]),
-    __metadata("design:returntype", Promise)
-], ProductService.prototype, "create", null);
-__decorate([
-    (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true, transformOptions: { enableImplicitConversion: true } })),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], ProductService.prototype, "findAll", null);
-__decorate([
-    (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true, transformOptions: { enableImplicitConversion: true } })),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", Promise)
-], ProductService.prototype, "findOne", null);
-__decorate([
-    (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true, transformOptions: { enableImplicitConversion: true } })),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number]),
-    __metadata("design:returntype", Promise)
-], ProductService.prototype, "paginateProducts", null);
-__decorate([
-    (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true, transformOptions: { enableImplicitConversion: true } })),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_product_dto_1.UpdateProductDto]),
-    __metadata("design:returntype", Promise)
-], ProductService.prototype, "update", null);
-__decorate([
-    (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true, transformOptions: { enableImplicitConversion: true } })),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", Promise)
-], ProductService.prototype, "remove", null);
 exports.ProductService = ProductService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)("PRODUCTS_REPOSITORY")),

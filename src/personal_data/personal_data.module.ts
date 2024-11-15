@@ -6,12 +6,14 @@ import { SequelizeProvider } from 'src/sequelize/sequelize.provider';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { PersonalDatum } from './entities/personal_datum.entity';
 import { RolsModule } from 'src/rol/rols.module';
+import { usersProvider } from 'src/user/providers/user.provider';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   controllers: [PersonalDataController],
-  providers: [PersonalDataService, ...personaldatasProvider],
+  providers: [PersonalDataService, ...personaldatasProvider, ...usersProvider],
   imports:[
-    SequelizeProvider, RolsModule, SequelizeModule.forFeature([PersonalDatum])
+    SequelizeProvider, RolsModule, SequelizeModule.forFeature([PersonalDatum]), UserModule
   ]
 })
 export class PersonalDataModule {}

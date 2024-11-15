@@ -34,7 +34,7 @@ export class ProductSizeController {
   @Get('findOne/:id')
   @ApiOperation({summary: "Listar un tamaño de producto por id"})
   @Roles('Administrador', 'Usuario')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.productSizeService.findOne(+id);
   }
 
@@ -45,7 +45,7 @@ export class ProductSizeController {
   @Patch('updateOne/:id')
   @ApiOperation({summary: "Actualizar un tamaño de producto segun el id"})
   @Roles('Administrador')
-  update(@Param('id') id: string, @Body() updateProductSizeDto: UpdateProductSizeDto) {
+  update(@Param('id') id: number, @Body() updateProductSizeDto: UpdateProductSizeDto) {
     return this.productSizeService.update(+id, updateProductSizeDto);
   }
 
@@ -56,7 +56,7 @@ export class ProductSizeController {
   @Delete('deleteOne/:id')
   @ApiOperation({summary: "Eliminar un tamaño de producto segun el id"})
   @Roles('Administrador')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.productSizeService.remove(+id);
   }
 }
