@@ -336,6 +336,37 @@ module.exports = {
         defaultValue: 0
       }
     });
+    await queryInterface.createTable("historial_tokens", {
+      idtoken: {
+        autoIncrement: true,
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+      },
+      user_iduser: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "usuarios",
+          key: "iduser",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+      },
+      token:{
+        type: Sequelize.STRING(255),
+        allowNull: false
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW,
+      },
+      expiresAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+    });
 },
 
   async down(queryInterface, Sequelize) {
@@ -346,8 +377,10 @@ module.exports = {
     await queryInterface.dropTable('facturas');
     await queryInterface.dropTable('ventas');
     await queryInterface.dropTable('existencias');
+    await queryInterface.dropTable("categorias");
     await queryInterface.dropTable('productos');
     await queryInterface.dropTable('departamentos');
+    await queryInterface.dropTable("historial_tokens");
     await queryInterface.dropTable('usuarios');
     await queryInterface.dropTable('roles');
   },

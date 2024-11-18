@@ -15,9 +15,10 @@ import { ProductModule } from './product/product.module';
 import { StockModule } from './stock/stock.module';
 import { ProductSizeModule } from './product_size/product_size.module';
 import { EmailModule } from './services/smtp/smtp.module'
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
-  imports: [TiendaModule, UserModule, RolsModule, AuthModule, DepartmentsModule, SizesModule, PersonalDataModule, BillModule, SaleModule, SaleProductModule, ProductModule, StockModule, ProductSizeModule,EmailModule],
+  imports: [TiendaModule, UserModule, RolsModule, AuthModule, DepartmentsModule, SizesModule, PersonalDataModule, BillModule, SaleModule, SaleProductModule, ProductModule, StockModule, ProductSizeModule,EmailModule, ScheduleModule.forRoot()],
   controllers: [AppController],
   providers: [AppService],
 })

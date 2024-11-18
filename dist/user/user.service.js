@@ -57,6 +57,19 @@ let UserService = class UserService {
         }
         return await UserFound;
     }
+    async findById(id) {
+        const userFound = await this.userRepository.findOne({
+            where: {
+                iduser: {
+                    [sequelize_1.Op.eq]: id
+                }
+            }
+        });
+        if (!userFound) {
+            throw new common_1.NotFoundException("Usuario no encontrado");
+        }
+        return userFound;
+    }
     async findAll() {
         return await this.userRepository.findAll({
             where: {
@@ -113,6 +126,20 @@ let UserService = class UserService {
             throw new common_1.NotFoundException("Usuario a actualizar no fue encontrado");
         }
         return { message: "Usuario actualizado correctamente", status: 200, data };
+    }
+    async updatePassword(password, id) {
+        const [userUpdate] = await this.userRepository.update({
+            password
+        }, {
+            where: {
+                iduser: {
+                    [sequelize_1.Op.eq]: id
+                }
+            }
+        });
+        if (userUpdate === 0) {
+            throw new common_1.NotFoundException("Contraseña no fue actualizada");
+        }
     }
     async delete(id) {
         const [userDelete] = await this.userRepository.update({ is_deleted: 1 }, {

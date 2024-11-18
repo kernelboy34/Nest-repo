@@ -25,12 +25,10 @@ let SmtpService = class SmtpService {
             },
         });
     }
-    async sendMail(to, subject, text) {
+    async sendMail(data) {
         const mailOptions = {
             from: 'vanpedrazas@gmail.com',
-            to,
-            subject,
-            text,
+            data
         };
         return this.transporter.sendMail(mailOptions);
     }

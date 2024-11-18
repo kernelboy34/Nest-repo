@@ -53,6 +53,21 @@ export class UserService{
         return await UserFound
     }
 
+    async findById(id: number){
+        const userFound = await this.userRepository.findOne({
+            where:{
+                iduser:{
+                    [Op.eq]: id
+                }
+            }
+        })
+        if(!userFound){
+            throw new NotFoundException("Usuario no encontrado")
+        }
+
+        return userFound
+    }
+
     async findAll(): Promise<User[]>{
         return await this.userRepository.findAll({
             where:{
@@ -114,6 +129,22 @@ export class UserService{
         }
 
         return {message: "Usuario actualizado correctamente", status: 200, data}
+    }
+
+    async updatePassword(password: string, id:number): Promise<void>{
+        const [userUpdate] = await this.userRepository.update(
+        {
+            password
+        },{
+            where:{
+                iduser:{
+                    [Op.eq]: id
+                }
+            }
+        })
+        if(userUpdate === 0){
+            throw new NotFoundException("Contraseña no fue actualizada")
+        }
     }
 
     async delete(id: number){

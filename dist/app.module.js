@@ -24,12 +24,13 @@ const product_module_1 = require("./product/product.module");
 const stock_module_1 = require("./stock/stock.module");
 const product_size_module_1 = require("./product_size/product_size.module");
 const smtp_module_1 = require("./services/smtp/smtp.module");
+const schedule_1 = require("@nestjs/schedule");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [tienda_module_1.TiendaModule, user_module_1.UserModule, rols_module_1.RolsModule, auth_module_1.AuthModule, departments_module_1.DepartmentsModule, size_module_1.SizesModule, personal_data_module_1.PersonalDataModule, bill_module_1.BillModule, sale_module_1.SaleModule, sale_product_module_1.SaleProductModule, product_module_1.ProductModule, stock_module_1.StockModule, product_size_module_1.ProductSizeModule, smtp_module_1.EmailModule],
+        imports: [tienda_module_1.TiendaModule, user_module_1.UserModule, rols_module_1.RolsModule, auth_module_1.AuthModule, departments_module_1.DepartmentsModule, size_module_1.SizesModule, personal_data_module_1.PersonalDataModule, bill_module_1.BillModule, sale_module_1.SaleModule, sale_product_module_1.SaleProductModule, product_module_1.ProductModule, stock_module_1.StockModule, product_size_module_1.ProductSizeModule, smtp_module_1.EmailModule, schedule_1.ScheduleModule.forRoot()],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })

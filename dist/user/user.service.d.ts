@@ -8,6 +8,7 @@ export declare class UserService {
     constructor(userRepository: typeof User, rolRepository: typeof Rol);
     create(data: CreateUserDto): Promise<User>;
     findOne(email: string): Promise<User>;
+    findById(id: number): Promise<User>;
     findAll(): Promise<User[]>;
     findUserRole(userId: number): Promise<User>;
     findOneToLogin(email: string): Promise<User>;
@@ -16,6 +17,7 @@ export declare class UserService {
         status: number;
         data: UpdateUserDto;
     }>;
+    updatePassword(password: string, id: number): Promise<void>;
     delete(id: number): Promise<{
         message: string;
         status: number;

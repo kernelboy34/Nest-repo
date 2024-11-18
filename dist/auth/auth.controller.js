@@ -17,12 +17,20 @@ const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const auth_dto_1 = require("./dto/auth.dto");
 const swagger_1 = require("@nestjs/swagger");
+const token_forgot_dto_1 = require("./dto/token_forgot.dto");
+const token_reset_dto_1 = require("./dto/token_reset.dto");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
     signIn(data) {
         return this.authService.signIn(data);
+    }
+    async forgotPassword(email) {
+        return this.authService.forgotPassword(email);
+    }
+    async resetPassword(data) {
+        return this.authService.resetPassword(data);
     }
 };
 exports.AuthController = AuthController;
@@ -35,6 +43,22 @@ __decorate([
     __metadata("design:paramtypes", [auth_dto_1.AuthDTO]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "signIn", null);
+__decorate([
+    (0, common_1.Post)('forgot-password'),
+    (0, swagger_1.ApiOperation)({ summary: "Olvide mi contraseña" }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [token_forgot_dto_1.Forgot_TokenDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "forgotPassword", null);
+__decorate([
+    (0, common_1.Post)('reset-password'),
+    (0, swagger_1.ApiOperation)({ summary: "resetear contraseña una vez recibido el token" }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [token_reset_dto_1.ResetTokenDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "resetPassword", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     (0, swagger_1.ApiTags)("Autentificacion"),

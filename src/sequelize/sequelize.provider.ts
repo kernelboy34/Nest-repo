@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common"
 import { SequelizeModule } from "@nestjs/sequelize"
 import { Sequelize } from "sequelize-typescript"
+import { ResetToken } from "src/auth/entity/token.entity"
 import { Bill } from "src/bill/entities/bill.entity"
 import { config } from "src/config/config"
 import { Department } from "src/department/entities/department.entity"
@@ -24,7 +25,7 @@ import { User } from "src/user/entity/user.entity"
             username: config.db_user,
             password: config.db_pass,
             database: config.db_database,
-            models:[User, Rol, Size, Product, PersonalDatum, Stock, Department, Sale, Bill, SaleProduct, ProductSize],
+            models:[User, Rol, Size, Product, PersonalDatum, Stock, Department, Sale, Bill, SaleProduct, ProductSize, ResetToken],
             autoLoadModels: true,
             synchronize:true
         })

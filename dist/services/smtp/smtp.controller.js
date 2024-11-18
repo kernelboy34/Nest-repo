@@ -28,7 +28,7 @@ let EmailController = class EmailController {
             throw new common_1.HttpException('El dominio del correo no está permitido.', common_1.HttpStatus.FORBIDDEN);
         }
         try {
-            await this.smtpService.sendMail(sendEmailDto.to, sendEmailDto.subject, sendEmailDto.text);
+            await this.smtpService.sendMail(sendEmailDto);
             return { message: 'Correo enviado exitosamente' };
         }
         catch (error) {

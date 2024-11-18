@@ -15,12 +15,13 @@ const config_1 = require("../config/config");
 const auth_controller_1 = require("./auth.controller");
 const passport_1 = require("@nestjs/passport");
 const auth_strategy_1 = require("./auth.strategy");
+const token_provider_1 = require("./provider/token.provider");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
-        providers: [auth_service_1.AuthService, auth_strategy_1.JwtStrategy],
+        providers: [auth_service_1.AuthService, auth_strategy_1.JwtStrategy, ...token_provider_1.tokenProvider],
         imports: [
             user_module_1.UserModule,
             passport_1.PassportModule,
@@ -28,7 +29,7 @@ exports.AuthModule = AuthModule = __decorate([
                 global: true,
                 secret: config_1.config.token,
                 signOptions: {}
-            })
+            }),
         ],
         controllers: [auth_controller_1.AuthController],
         exports: [auth_service_1.AuthService]
