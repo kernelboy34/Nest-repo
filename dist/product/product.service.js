@@ -22,6 +22,16 @@ let ProductService = class ProductService {
         this.productRepository = productRepository;
     }
     async create(data) {
+        const sameName = await this.productRepository.findOne({
+            where: {
+                name: {
+                    [sequelize_1.Op.like]: data.name
+                }
+            }
+        });
+        if (sameName) {
+            throw new common_1.ConflictException("Este Producto ya existe");
+        }
         return await this.productRepository.create({
             name: data.name,
             imageUrl: data.imageUrl,

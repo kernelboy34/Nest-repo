@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
@@ -14,6 +14,16 @@ export class ProductService {
   ){}
 
   async create(data: CreateProductDto): Promise<Product>{
+    const sameName = await this.productRepository.findOne({
+      where:{
+        name:{
+          [Op.like]: data.name
+        }
+      }
+    })
+    if(sameName){
+      throw new ConflictException("Este Producto ya existe")
+    }
     return await this.productRepository.create({
       name: data.name,
       imageUrl: data.imageUrl,
