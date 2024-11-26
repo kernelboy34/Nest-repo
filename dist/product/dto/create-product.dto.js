@@ -19,6 +19,8 @@ exports.CreateProductDto = CreateProductDto;
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
+    (0, class_transformer_1.Transform)(({ value }) => value?.trim()),
+    (0, class_validator_1.IsNotEmpty)({ message: "No puede contener vacios el nombre" }),
     (0, swagger_1.ApiProperty)({ example: "Camiseta", description: "Nombre del producto" }),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "name", void 0);
@@ -31,6 +33,7 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsNotEmpty)(),
     (0, class_transformer_1.Type)(() => Number),
     (0, swagger_1.ApiProperty)({ example: 15.3, description: "Un precio unitario para el producto" }),
     __metadata("design:type", Number)

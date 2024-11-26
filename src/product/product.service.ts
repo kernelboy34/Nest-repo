@@ -24,6 +24,8 @@ export class ProductService {
     if(sameName){
       throw new ConflictException("Este Producto ya existe")
     }
+
+    
     return await this.productRepository.create({
       name: data.name,
       imageUrl: data.imageUrl,

@@ -1,9 +1,11 @@
 import { IsInt, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 export class CreateProductDto {
     @IsOptional()
     @IsString()
+    @Transform(({ value }) => value?.trim())
+    @IsNotEmpty({message: "No puede contener vacios el nombre"})
     @ApiProperty({example: "Camiseta", description: "Nombre del producto"})
     name:string
 
@@ -14,6 +16,7 @@ export class CreateProductDto {
 
     @IsOptional()
     @IsNumber()
+    @IsNotEmpty()
     //TODO: Puedes cambiar el IsNumber() a IsDecimal({force_decimal: false, decimal_digits:'10,2'})
     @Type(()=> Number)
     @ApiProperty({example: 15.3, description: "Un precio unitario para el producto"})
